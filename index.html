@@ -33,32 +33,7 @@
     <![endif]-->
      <script type="text/javascript" src="http://cdn.leafletjs.com/leaflet-0.5/leaflet.js"></script>
      <style type="text/javascript">#map { height: 180px; }</style>
-     <script type="text/javascript"  >
 
-
-    var map = L.map('map', {
-    center:[35.600251, -82.570848],
-    zoom: 17.5,
-    zoomControl: false 
-    });
-
-    var zoom = new L.control.zoom();
-    zoom.setPosition('topright').addTo(map);
-          
-
-          
-    //Adding WMS layers from geoserver
-
-    var lots = L.tileLayer.wms("http://opendataserver.ashevillenc.gov:80/geoserver/wms", {
-         layers: 'bc_street',
-         format: 'image/png',
-         maxZoom: 25,
-         transparent: true,
-         zIndex: 4
-
-    }).addTo(map);
-   
-     </script>
   </head>
 
   <body>
@@ -131,6 +106,31 @@
     <script src="js/bootstrap-collapse.js"></script>
     <script src="js/bootstrap-carousel.js"></script>
     <script src="js/bootstrap-typeahead.js"></script>
+     <script type="text/javascript"  >
 
+
+    var map = L.map('map', {
+    center:[35.600251, -82.570848],
+    zoom: 17.5,
+    zoomControl: false 
+    });
+
+    var zoom = new L.control.zoom();
+    zoom.setPosition('topright').addTo(map);
+          
+
+          
+    //Adding WMS layers from geoserver
+
+    var lots = L.tileLayer.wms("http://opendataserver.ashevillenc.gov:80/geoserver/wms", {
+         layers: 'bc_street',
+         format: 'image/png',
+         maxZoom: 25,
+         transparent: true,
+         zIndex: 4
+
+    }).addTo(map);
+   
+     </script>
   </body>
 </html>
