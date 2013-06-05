@@ -20,13 +20,7 @@
   <link rel="stylesheet" href="http://serverapi.arcgisonline.com/jsapi/arcgis/3.5/js/esri/css/esri.css">
   <link rel="stylesheet" href="http://serverapi.arcgisonline.com/jsapi/arcgis/3.5/js/dojo/dojox/layout/resources/FloatingPane.css">
   <style> 
-    body,html,#main{margin:0;padding:0;height:100%;width:100%;}
     .panel {
-    -moz-border-radius: 6px;
-    -webkit-border-radius: 6px;
-    -moz-box-shadow: 0px 6px 3px -3px #888;
-    -webkit-box-shadow: 0px 6px 3px -3px #888;
-    box-shadow: 0px 6px 3px -3px #888;
     border: 2px solid #86942A;
     margin: 5px;5px;5px;5px;
   }
@@ -66,7 +60,7 @@
         });
 
         var imageParameters = new esri.layers.ImageParameters();
-        imageParameters.format = "jpeg";  //set the image type to PNG24, note default is PNG8.
+        imageParameters.format = "PNG24";  //set the image type to PNG24, note default is PNG8.
 
         //Takes a URL to a non cached map service.
         var dynamicMapServiceLayer = new esri.layers.ArcGISDynamicMapServiceLayer("http://gis.ashevillenc.gov/COA_ArcGIS_Server/rest/services/mapAsheville/Test_BaseMap/MapServer", {
