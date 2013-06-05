@@ -111,7 +111,7 @@
 
     var map = L.map('map', {
     center:[35.600251, -82.570848],
-    zoom: 17.5,
+    zoom: 10,
     zoomControl: false 
     });
 
@@ -140,7 +140,7 @@
     }).addTo(map);
     
     var COA_url = 'http://coa-gis-imagery/COA_Internal_ArcGIS/rest/services/Publish/Test_base_map_10/MapServerr/tile/{z}/{y}/{x}';
-    var test = L.tileLayer(COA_url, {maxZoom: 25,attribution:'test'}).addTo(map);
+    var test = L.tileLayer(COA_url, {maxZoom: 11,attribution:'test'}).addTo(map);
      </script>
   </body>
 </html>
