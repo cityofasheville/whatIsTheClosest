@@ -127,7 +127,17 @@
          format: 'image/png',
          maxZoom: 25,
          transparent: true,
-         zIndex: 4
+         zIndex: 1
+
+    }).addTo(map);
+    
+    
+    var lots = L.tileLayer.wms("http://opendataserver.ashevillenc.gov:80/geoserver/wms", {
+         layers: 'bc_street_generalized',
+         format: 'image/png',
+         maxZoom: 25,
+         transparent: true,
+         zIndex: 2
 
     }).addTo(map);
    
