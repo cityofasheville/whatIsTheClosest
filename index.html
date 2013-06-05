@@ -33,20 +33,31 @@
     <![endif]-->
      <script type="text/javascript" src="http://cdn.leafletjs.com/leaflet-0.5/leaflet.js"></script>
      <style type="text/javascript">#map { height: 180px; }</style>
-     <script type="text/javascript" >
-        var map = new L.Map('map', {
-        center: new L.LatLng(45.50144, -122.67599),
-        zoom: 4,
-        minZoom: 0,
-        maxZoom: 18,
-        layers: [
-            L.tileLayer('http://server.arcgisonline.com/ArcGIS/' + 'rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-            minZoom: 14,
-            maxZoom: 18,
-            attribution: 'Tiles © Esri — ' 
-                + 'Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, ' 
-                + 'Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'})
-        ]});
+     <script type="text/javascript"  >
+
+
+    var map = L.map('map', {
+    center:[35.600251, -82.570848],
+    zoom: 17.5,
+    zoomControl: false 
+    });
+
+    var zoom = new L.control.zoom();
+    zoom.setPosition('topright').addTo(map);
+          
+
+          
+    //Adding WMS layers from geoserver
+
+    var lots = L.tileLayer.wms("http://opendataserver.ashevillenc.gov:80/geoserver/wms", {
+         layers: 'bc_street',
+         format: 'image/png',
+         maxZoom: 25,
+         transparent: true,
+         zIndex: 4
+
+    }).addTo(map);
+   
      </script>
   </head>
 
