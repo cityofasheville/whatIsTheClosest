@@ -116,23 +116,12 @@
     });
 
     var zoom = new L.control.zoom();
-    zoom.setPosition('topright').addTo(map);
+    zoom.setPosition('topleft').addTo(map);
           
 
           
-    //Adding WMS layers from geoserver
-
-    var lots = L.tileLayer.wms("http://opendataserver.ashevillenc.gov:80/geoserver/wms", {
-         layers: 'bc_street',
-         format: 'image/png',
-         maxZoom: 25,
-         transparent: true,
-         zIndex: 10
-
-    }).addTo(map);
-    
-    
-    var lots = L.tileLayer.wms("http://opendataserver.ashevillenc.gov:80/geoserver/wms", {
+    // WMS layers from geoserver   
+    var test = L.tileLayer.wms("http://opendataserver.ashevillenc.gov:80/geoserver/wms", {
          layers: 'bc_street_generalized',
          format: 'image/png',
          maxZoom: 25,
@@ -141,6 +130,17 @@
 
     }).addTo(map);
    
+       var test = L.tileLayer.wms("http://opendataserver.ashevillenc.gov:80/geoserver/wms", {
+         layers: 'bc_street',
+         format: 'image/png',
+         maxZoom: 25,
+         attributio: 'test',
+         zIndex: 10
+
+    }).addTo(map);
+    
+    var COA_url = 'http://coa-gis-imagery/COA_Internal_ArcGIS/rest/services/Publish/Test_base_map_10/MapServerr/tile/{z}/{y}/{x}';
+    var test = L.tileLayer(COA_url, {maxZoom: 25,attribution:'test'}).addTo(map);
      </script>
   </body>
 </html>
