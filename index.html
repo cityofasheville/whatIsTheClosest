@@ -232,7 +232,7 @@
   
         <div class="span9">
           <div class="row-fluid">
-            <div class="span9" id="search">
+            <div class="span9" >
               <h2>Search</h2>
               <p>Put search here</p>
               <div id="search"></div>
@@ -245,7 +245,10 @@
           <div class="row-fluid">
             <div class="span9" >
               <h2>Map</h2>
-              <div id="map"></div>
+               <div  id="map" 
+                    data-dojo-type="dijit.layout.ContentPane" 
+                    data-dojo-props="region:'center'" class="panel">
+               </div>
               <p>put map here</p>
               <p><a class="btn" href="#">View details &raquo;</a></p>
             </div><!--/span-->
