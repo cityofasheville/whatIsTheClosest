@@ -31,6 +31,175 @@
     <script type="text/javascript" >var dojoConfig = { parseOnLoad:true };</script> 
     <script type="text/javascript" src="http://serverapi.arcgisonline.com/jsapi/arcgis/3.5/"></script>
 
+  <script  type="text/javascript">
+    dojo.require("esri.map");  
+    dojo.require("esri.tasks.closestfacility");
+    dojo.require("dijit.dijit");
+    dojo.require("dijit.form.ComboBox");
+    dojo.require("dijit.layout.BorderContainer");
+    dojo.require("dijit.layout.ContentPane");
+    
+    var map, incidentsGraphicsLayer, routeGraphicLayer;
+    var closestFacilityTask, params;
+
+
+                
+      function init() {
+        map = new esri.Map("map", { 
+          sliderOrientation: "horizontal"
+        });
+
+        var imageParameters = new esri.layers.ImageParameters();
+        imageParameters.format = "jpeg";  //set the image type to PNG24, note default is PNG8.
+
+        //Takes a URL to a non cached map service.
+        var dynamicMapServiceLayer = new esri.layers.ArcGISDynamicMapServiceLayer("http://gis.ashevillenc.gov/COA_ArcGIS_Server/rest/services/mapAsheville/Test_BaseMap/MapServer", {
+          "opacity":0.5, 
+          "imageParameters":imageParameters
+        });
+        
+        map.addLayer(dynamicMapServiceLayer);
+      
+ 
+      
+
+      dojo.connect(map, "onClick", mapClickHandler);
+      
+      params = new esri.tasks.ClosestFacilityParameters();
+      params.defaultCutoff= 3.0;
+      params.returnIncidents=false;
+      params.returnRoutes=true;
+      params.returnDirections=true;
+      
+      dojo.connect(map, "onLoad", function(map) {
+        var facilityPointSymbol = new esri.symbol.SimpleMarkerSymbol(
+          esri.symbol.SimpleMarkerSymbol.STYLE_SQUARE, 
+          20,
+          new esri.symbol.SimpleLineSymbol(
+            esri.symbol.SimpleLineSymbol.STYLE_SOLID,
+            new dojo.Color([89,95,35]), 2
+          ),
+          new dojo.Color([130,159,83,0.40])
+        ); 
+
+        var incidentPointSymbol = new esri.symbol.SimpleMarkerSymbol(
+          esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE, 
+          16,
+          new esri.symbol.SimpleLineSymbol(
+            esri.symbol.SimpleLineSymbol.STYLE_SOLID,
+            new dojo.Color([89,95,35]), 2
+          ),
+          new dojo.Color([130,159,83,0.40])
+        );  
+
+        incidentsGraphicsLayer = new esri.layers.GraphicsLayer();
+        
+        var incidentsRenderer = new esri.renderer.SimpleRenderer(incidentPointSymbol);
+        incidentsGraphicsLayer.setRenderer(incidentsRenderer);
+        map.addLayer(incidentsGraphicsLayer);
+
+        routeGraphicLayer = new esri.layers.GraphicsLayer();
+        
+        var routePolylineSymbol = new esri.symbol.SimpleLineSymbol(
+          esri.symbol.SimpleLineSymbol.STYLE_SOLID, 
+          new dojo.Color([89,95,35]), 
+          4.0
+        );
+        var routeRenderer = new esri.renderer.SimpleRenderer(routePolylineSymbol);
+        routeGraphicLayer.setRenderer(routeRenderer);
+
+        map.addLayer(routeGraphicLayer);
+
+        var facilitiesGraphicsLayer = new esri.layers.GraphicsLayer();
+        var facilityRenderer = new esri.renderer.SimpleRenderer(facilityPointSymbol);
+        facilitiesGraphicsLayer.setRenderer(facilityRenderer);
+       
+        map.addLayer(facilitiesGraphicsLayer);
+        //alert(map.spatialReference.wkid)
+        //facilitiesGraphicsLayer.add(new esri.Graphic(new esri.geometry.Point(-82.5488,35.593,map.spatialReference)));
+        facilitiesGraphicsLayer.add(new esri.Graphic(new esri.geometry.Point(942559.3131500304,690578.6353148625,map.spatialReference)));
+        facilitiesGraphicsLayer.add(new esri.Graphic(new esri.geometry.Point(941771.9345977657,691136.1560300763,map.spatialReference)));
+        facilitiesGraphicsLayer.add(new esri.Graphic(new esri.geometry.Point(941710.1738841726,692662.5279517361,map.spatialReference))); 
+        facilitiesGraphicsLayer.add(new esri.Graphic(new esri.geometry.Point(943977.6743689503,690774.4147076021,map.spatialReference))); 
+        facilitiesGraphicsLayer.add(new esri.Graphic(new esri.geometry.Point(943995.3202871197,689256.8657450271,map.spatialReference))); 
+   
+        var facilities = new esri.tasks.FeatureSet();
+        facilities.features = facilitiesGraphicsLayer.graphics;
+        
+        params.facilities = facilities;
+        params.outSpatialReference = map.spatialReference;
+       
+       
+      });
+      closestFacilityTask = new esri.tasks.ClosestFacilityTask("http://coa-gis-imagery/COA_Internal_ArcGIS/rest/services/Publish/test_route/NAServer/Closest Facility");
+                                                                
+    }
+    function clearGraphics() {
+      //clear graphics
+      dojo.byId("directionsDiv").innerHTML= "";
+      map.graphics.clear();
+      routeGraphicLayer.clear();
+      incidentsGraphicsLayer.clear();    
+    } 
+
+    function mapClickHandler(evt) {
+      clearGraphics();
+      dojo.byId("directionsDiv").innerHTML= "";
+      var inPoint = new esri.geometry.Point(evt.mapPoint.x,evt.mapPoint.y,map.spatialReference);
+      var location = new esri.Graphic(inPoint);
+      incidentsGraphicsLayer.add(location);
+      //prompt('',evt.mapPoint.x+'||-'+evt.mapPoint.y);
+      var features = [];
+      features.push(location);
+      var incidents = new esri.tasks.FeatureSet();
+      incidents.features = features;
+      params.incidents = incidents;
+      
+      map.graphics.enableMouseEvents();
+     
+      dojo.connect(routeGraphicLayer,"onMouseOver", function(evt){
+        //clear existing directions and highlight symbol
+        map.graphics.clear();
+        
+        dojo.byId("directionsDiv").innerHTML= "Hover over the route to view directions";
+        
+        var highlightSymbol = new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new dojo.Color([0,255,255],0.25), 4.5);
+        var highlightGraphic = new esri.Graphic(evt.graphic.geometry,highlightSymbol);
+        
+        map.graphics.add(highlightGraphic);
+        dojo.byId("directionsDiv").innerHTML = esri.substitute(evt.graphic.attributes,"${*}");
+
+      });
+
+      //solve 
+      closestFacilityTask.solve(params,function(solveResult){
+        var directions = solveResult.directions;
+      
+        dojo.forEach(solveResult.routes, function(route, index){
+          //build an array of route info
+          
+          var attr = dojo.map(solveResult.directions[index].features,function(feature){
+            
+            return feature.attributes.text;
+          });
+          var infoTemplate = new esri.InfoTemplate("Attributes", "${*}");
+          
+          route.setInfoTemplate(infoTemplate);
+          route.setAttributes(attr);
+          
+          routeGraphicLayer.add(route);
+          dojo.byId("directionsDiv").innerHTML = "Hover over the route to view directions";
+        });
+        
+        //display any messages
+        if(solveResult.messages.length > 0){
+          dojo.byId("directionsDiv").innerHTML = "<b>Error:</b> " + solveResult.messages[0];
+        }      
+      });
+    }          
+
+    dojo.ready(init);
+  </script>
     
   </head>
 
@@ -63,10 +232,7 @@
   
         <div class="span9">
           <div class="row-fluid">
-            <div class="span4">
-              <h2>Heading</h2>
-              <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
-              <p><a class="btn" href="#">View details &raquo;</a></p>
+            <div class="span4" id="map">
             </div><!--/span-->
             <div class="span4">
               <h2>Heading</h2>
