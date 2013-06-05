@@ -34,9 +34,19 @@
      <script type="text/javascript" src="http://cdn.leafletjs.com/leaflet-0.5/leaflet.js"></script>
      <style type="text/javascript">#map { height: 180px; }</style>
      <script type="text/javascript" >
-        var map = L.map('map').setView([35.5364, -82.6931], 12); 
-        esriLayer = L.tileLayer('http://coa-gis-imagery/COA_Internal_ArcGIS/rest/services/Publish/Test_base_map_10/MapServer/tile/{z}/{y}/{x}.png');
-         map.addLayer(esriLayer);
+ar map = new L.Map('amap', {
+center: new L.LatLng(45.50144, -122.67599),
+zoom: 4,
+minZoom: 0,
+maxZoom: 18,
+layers: [
+    L.tileLayer('http://server.arcgisonline.com/ArcGIS/' + 'rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    minZoom: 14,
+    maxZoom: 18,
+    attribution: 'Tiles © Esri — ' 
+        + 'Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, ' 
+        + 'Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'})
+]});
      </script>
   </head>
 
