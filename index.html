@@ -310,6 +310,24 @@
             <div class="span9" >
               <h2>Search</h2>
               <p>Put search here</p>
+                    <div id="leftPane" class="roundedCorners" 
+                        data-dojo-type="dijit.layout.ContentPane" 
+                        data-dojo-props="region:'left'">
+                        Enter an input address and the application will use the sample address locator to return the location for 
+                        street addresses in the United States. 
+                        <br />Address:
+                        <textarea type="text" id="address"/>70 court pz</textArea>
+                        <br />Zip:
+                        <textarea type="text" id="zone"/>28801</textArea>
+                        <br />
+                         <button type="submit" class="btn" onclick="locate()" >Submit</button>
+                        <!--
+                        <button data-dojo-type="dijit.form.Button" onclick="locate()"> Locate</button>  
+                        -->
+                        </div>
+                    <div id="map" class="roundedCorners shadow" data-dojo-type="dijit.layout.ContentPane" data-dojo-props="region:'center'">
+                    </div>
+
               <div id="search"></div>
               <p><a class="btn" href="#">View details &raquo;</a></p>
             </div><!--/span-->
