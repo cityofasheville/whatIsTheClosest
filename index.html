@@ -160,6 +160,9 @@
        
       });
       closestFacilityTask = new esri.tasks.ClosestFacilityTask("http://coa-gis-imagery/COA_Internal_ArcGIS/rest/services/Publish/test_route/NAServer/Closest Facility");
+
+        locator = new esri.tasks.Locator("http://gis.ashevillenc.gov/COA_ArcGIS_Server/rest/services/Buncombe_Address_Point/GeocodeServer");
+        dojo.connect(locator, "onAddressToLocationsComplete", showResults);
                                                                 
     }
     function clearGraphics() {
@@ -225,8 +228,6 @@
         }      
       });
 
-        locator = new esri.tasks.Locator("http://gis.ashevillenc.gov/COA_ArcGIS_Server/rest/services/Buncombe_Address_Point/GeocodeServer");
-        dojo.connect(locator, "onAddressToLocationsComplete", showResults);
         
         map.infoWindow.resize(200,125);
       }
@@ -234,7 +235,7 @@
       function locate() {
         map.graphics.clear();
         var address = {"Street":dojo.byId("address").value,"Zone":dojo.byId("zone").value};
-        locator.outSpatialReference= new esri.SpatialReference({wkid: 2264}); //map.spatialReference;
+        locator.outSpatialReference= map.spatialReference; //new esri.SpatialReference({wkid: 2264});
         var options = {
           address:address,
           outFields:["Loc_name"]
