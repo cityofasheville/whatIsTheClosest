@@ -225,7 +225,7 @@
         }      
       });
 
-        locator = new esri.tasks.Locator("http://gis.ashevillenc.gov/COA_ArcGIS_Server/rest/services/Buncombe_Address_WGS84/GeocodeServer");
+        locator = new esri.tasks.Locator("http://gis.ashevillenc.gov/COA_ArcGIS_Server/rest/services/Buncombe_Address_Point/GeocodeServer");
         dojo.connect(locator, "onAddressToLocationsComplete", showResults);
         alert(showResults);
         map.infoWindow.resize(200,125);
@@ -234,7 +234,7 @@
       function locate() {
         map.graphics.clear();
         var address = {"Street":dojo.byId("address").value,"Zone":dojo.byId("zone").value};
-        locator.outSpatialReference= map.spatialReference;
+        locator.outSpatialReference= new esri.SpatialReference({wkid: 2264}); //map.spatialReference;
         var options = {
           address:address,
           outFields:["Loc_name"]
