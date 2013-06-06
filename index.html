@@ -91,7 +91,7 @@
  
       
 
-      //dojo.connect(map, "onClick", mapClickHandler);
+      dojo.connect(map, "onClick", mapClickHandler);
       
       params = new esri.tasks.ClosestFacilityParameters();
       params.defaultCutoff= 3.0;
@@ -172,8 +172,7 @@
       routeGraphicLayer.clear();
       incidentsGraphicsLayer.clear();    
     } 
-     
-      
+
     function mapClickHandler(evt) {
       clearGraphics();
       dojo.byId("directionsDiv").innerHTML= "";
@@ -270,7 +269,6 @@
             var textSymbol = new esri.symbol.TextSymbol(displayText,font,new dojo.Color("#666633"));
             textSymbol.setOffset(0,8);
             map.graphics.add(new esri.Graphic(geom, textSymbol));
-            getRoute(geom.x,geom.y) 
             return false; //break out of loop after one candidate with score greater  than 80 is found.
           }
         });
