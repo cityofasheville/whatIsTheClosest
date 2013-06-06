@@ -268,7 +268,7 @@
             //add a graphic to the map at the geocoded location
             map.graphics.add(graphic);
 
-       var inPoint = new esri.geometry.Point(graphic.x,graphic.y,map.spatialReference);
+       var inPoint = new esri.geometry.Point(geom.x,geom.y,map.spatialReference);
        alert(graphic.x);
       var location = new esri.Graphic(inPoint);
       incidentsGraphicsLayer.add(location);
