@@ -85,7 +85,7 @@
           </div>
          </div>
          
-        <p><br /></p>
+        <p><br/></p>
  
 
     </div> <!-- /container -->
@@ -125,6 +125,7 @@
          layers: 'bc_street_generalized',
          format: 'image/png',
          maxZoom: 25,
+         minZoom: 12;
          transparent: true,
          zIndex: 1
 
@@ -133,7 +134,7 @@
        var test = L.tileLayer.wms("http://opendataserver.ashevillenc.gov:80/geoserver/wms", {
          layers: 'bc_street',
          format: 'image/png',
-         maxZoom: 12,
+         maxZoom: 25,
          attributio: 'test',
          transparent: true,
          zIndex: 10
