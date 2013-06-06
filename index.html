@@ -172,67 +172,7 @@
       routeGraphicLayer.clear();
       incidentsGraphicsLayer.clear();    
     } 
-
-   function getRoute(x,y) {
-      clearGraphics();
-      dojo.byId("directionsDiv").innerHTML= "";
-      var inPoint = new esri.geometry.Point(x,y);
-      var location = new esri.Graphic(inPoint);
-      incidentsGraphicsLayer.add(location);
-      //prompt('',evt.mapPoint.x+'||-'+evt.mapPoint.y);
-      var features = [];
-      features.push(location);
-      var incidents = new esri.tasks.FeatureSet();
-      incidents.features = features;
-      params.incidents = incidents;
-      
-      map.graphics.enableMouseEvents();
      
-      dojo.connect(routeGraphicLayer,"onMouseOver", function(evt){
-        //clear existing directions and highlight symbol
-        map.graphics.clear();
-        
-        dojo.byId("directionsDiv").innerHTML= "Hover over the route to view directions";
-        
-        var highlightSymbol = new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new dojo.Color([0,255,255],0.25), 4.5);
-        var highlightGraphic = new esri.Graphic(evt.graphic.geometry,highlightSymbol);
-        
-        map.graphics.add(highlightGraphic);
-        dojo.byId("directionsDiv").innerHTML = esri.substitute(evt.graphic.attributes,"${*}");
-
-      });
-      
-
-      //solve 
-      closestFacilityTask.solve(params,function(solveResult){
-        var directions = solveResult.directions;
-      
-        dojo.forEach(solveResult.routes, function(route, index){
-          //build an array of route info
-          
-          var attr = dojo.map(solveResult.directions[index].features,function(feature){
-            
-            return feature.attributes.text;
-          });
-          var infoTemplate = new esri.InfoTemplate("Attributes", "${*}");
-          
-          route.setInfoTemplate(infoTemplate);
-          route.setAttributes(attr);
-          
-          routeGraphicLayer.add(route);
-          dojo.byId("directionsDiv").innerHTML = "Hover over the route to view directions";
-        });
-        
-        //display any messages
-        if(solveResult.messages.length > 0){
-          dojo.byId("directionsDiv").innerHTML = "<b>Error:</b> " + solveResult.messages[0];
-        }      
-      });
-
-        
-        map.infoWindow.resize(200,125);
-      }      
-      
       
     function mapClickHandler(evt) {
       clearGraphics();
