@@ -265,7 +265,7 @@
            </div>
         </div>
         
-        <div class="span9">
+        <!--<div class="span9">
           <div class="row-fluid">
             <div class="span9" >
               <h2>Map</h2>
@@ -275,9 +275,9 @@
                     data-dojo-props="region:'center'" class="panel">
                 </div>
 
-            </div><!--/span-->
+            </div>/span
           </div>
-         </div>
+         </div>-->
 
   
         <div class="span9">
@@ -330,37 +330,37 @@
      <script type="text/javascript"  >
 
 
-    var map = L.map('map', {
-    center:[35.600251, -82.570848],
-    zoom: 10,
-    zoomControl: false 
-    });
+//    var map = L.map('map', {
+//    center:[35.600251, -82.570848],
+//    zoom: 10,
+//    zoomControl: false 
+//    });
 
-    var zoom = new L.control.zoom();
-    zoom.setPosition('topleft').addTo(map);
-          
+//    var zoom = new L.control.zoom();
+//    zoom.setPosition('topleft').addTo(map);
+//          
 
-          
-    // WMS layers from geoserver   
-    var test = L.tileLayer.wms("http://opendataserver.ashevillenc.gov:80/geoserver/wms", {
-         layers: 'bc_street_generalized',
-         format: 'image/png',
-         maxZoom: 25,
-         minZoom: 12,
-         transparent: true,
-         zIndex: 1
+//          
+//    // WMS layers from geoserver   
+//    var test = L.tileLayer.wms("http://opendataserver.ashevillenc.gov:80/geoserver/wms", {
+//         layers: 'bc_street_generalized',
+//         format: 'image/png',
+//         maxZoom: 25,
+//         minZoom: 12,
+//         transparent: true,
+//         zIndex: 1
 
-    }).addTo(map);
-   
-       var test = L.tileLayer.wms("http://opendataserver.ashevillenc.gov:80/geoserver/wms", {
-         layers: 'bc_street',
-         format: 'image/png',
-         maxZoom: 25,
-         attributio: 'test',
-         transparent: true,
-         zIndex: 10
+//    }).addTo(map);
+//   
+//       var test = L.tileLayer.wms("http://opendataserver.ashevillenc.gov:80/geoserver/wms", {
+//         layers: 'bc_street',
+//         format: 'image/png',
+//         maxZoom: 25,
+//         attributio: 'test',
+//         transparent: true,
+//         zIndex: 10
 
-    }).addTo(map);
+//    }).addTo(map);
     
     //var COA_url = 'http://coa-gis-imagery/COA_Internal_ArcGIS/rest/services/Publish/Test_base_map_10/MapServerr/tile/{z}/{y}/{x}';
     //var test = L.tileLayer(COA_url, {maxZoom: 11,attribution:'test'}).addTo(map);
