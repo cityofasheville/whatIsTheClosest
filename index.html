@@ -227,7 +227,7 @@
 
         locator = new esri.tasks.Locator("http://gis.ashevillenc.gov/COA_ArcGIS_Server/rest/services/Buncombe_Address_Point/GeocodeServer");
         dojo.connect(locator, "onAddressToLocationsComplete", showResults);
-        alert(showResults);
+        
         map.infoWindow.resize(200,125);
       }
 
@@ -337,6 +337,7 @@
 
 
               <div id="search"></div>
+              <button data-dojo-type="dijit.form.Button" onclick="locate()"> Locate</button>  
               <button type="submit" class="btn" onclick="locate()" >Submit</button>
               <p><a class="btn" href="#">View details &raquo;</a></p>
             </div><!--/span-->
