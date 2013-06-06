@@ -235,7 +235,7 @@
       function locate() {
         map.graphics.clear();
         var address = {"Street":dojo.byId("address").value,"Zone":dojo.byId("zone").value};
-        locator.outSpatialReference= new esri.SpatialReference({wkid: 2264});//map.spatialReference; //new esri.SpatialReference({wkid: 2264});
+        locator.outSpatialReference= new esri.SpatialReference({wkid: 4326});//map.spatialReference; //new esri.SpatialReference({wkid: 2264});
         var options = {
           address:address,
           outFields:["Loc_name"]
