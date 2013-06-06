@@ -269,7 +269,7 @@
             map.graphics.add(graphic);
 
        var inPoint = new esri.geometry.Point(geom.x,geom.y,map.spatialReference);
-       alert(graphic.x);
+       alert(geom.x);
       var location = new esri.Graphic(inPoint);
       incidentsGraphicsLayer.add(location);
       
