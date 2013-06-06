@@ -225,7 +225,7 @@
         }      
       });
 
-        locator = new esri.tasks.Locator("http://gis.ashevillenc.gov/COA_ArcGIS_Server/rest/services/Buncombe_Address_Point/GeocodeServer");
+        locator = new esri.tasks.Locator("http://gis.ashevillenc.gov/COA_ArcGIS_Server/rest/services/Buncombe_Address_WGS84/GeocodeServer");
         dojo.connect(locator, "onAddressToLocationsComplete", showResults);
         alert(showResults);
         map.infoWindow.resize(200,125);
