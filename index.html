@@ -278,7 +278,34 @@
             </div><!--/span-->
           </div>
          </div>
-         
+
+  
+        <div class="span9">
+          <div class="row-fluid">
+            <div class="span9" >
+              <h2>Directions</h2>
+              <p>Put search here</p>
+                    <div id="directions" 
+                         data-dojo-type="dijit.layout.ContentPane" 
+                         data-dojo-props="region:'bottom'" class="panel" 
+                         style="height:250px;">
+
+                      <b>Click the map to find routes for the
+                      <select name="numLocations" data-dojo-type="dijit.form.ComboBox" value="1" onChange="params.defaultTargetFacilityCount=this.value;clearGraphics();" style="width:60px;">
+                          <option selected="selected">1</option>
+                          <option>2</option>
+                          <option>3</option>
+                          <option>4</option>
+                          <option>5</option>
+                      </select> closest facilities to the input point.</b> 
+                      <div id="directionsDiv"></div>
+
+                    </div>
+              
+            </div><!--/span-->
+           </div>
+        </div>
+                 
         <p><br/></p>
  
 
