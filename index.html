@@ -57,7 +57,6 @@
 
 
   <script type="text/javascript" >
-  //comment so i can commit
     dojo.require("esri.map");  
     dojo.require("esri.tasks.locator");
     dojo.require("dojo.number");
@@ -212,7 +211,8 @@
           
           var attr = dojo.map(solveResult.directions[index].features,function(feature){
             
-            return feature.attributes.text;
+            return feature.attributes.length;
+			
           });
           var infoTemplate = new esri.InfoTemplate("Attributes", "${*}");
           
