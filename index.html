@@ -212,11 +212,9 @@
           var attr = dojo.map(solveResult.directions[index].features,function(feature){
            
 
-            return feature.attributes.length.toPrecision(2);
+            return feature.attributes.length.toPrecision(1);
        
-for (i = 0; i < feature.length; i += 1) {
-    sum += feature.length[i];
-  return (feature.length); }
+
 
           });
           var infoTemplate = new esri.InfoTemplate("Attributes", "${*}");
@@ -312,14 +310,13 @@ for (i = 0; i < feature.length; i += 1) {
 
     <div class="container">
 
-      <h1>Bootstrap starter template</h1>
-      <p>Use this document as a way to quick start any new project.<br> All you get is this message and a barebones HTML document.</p>
+      
   
         <div class="span9">
           <div class="row-fluid">
             <div class="span9" >
-              <h2>Search</h2>
-              <p>Put search here</p>
+              <h2><br/><p>Search</h2>
+        <p>
                         <!--
                     <div id="leftPane" class="roundedCorners" 
                         data-dojo-type="dijit.layout.ContentPane" 
@@ -369,8 +366,8 @@ for (i = 0; i < feature.length; i += 1) {
         <div class="span9">
           <div class="row-fluid">
             <div class="span9" >
-              <h2>Directions</h2>
-              <p>Put search here</p>
+              <h2><br/>Directions</h2>
+              
                     <div id="directions" 
                          data-dojo-type="dijit.layout.ContentPane" 
                          data-dojo-props="region:'bottom'" class="panel" 
@@ -383,7 +380,7 @@ for (i = 0; i < feature.length; i += 1) {
                           <option>3</option>
                           <option>4</option>
                           <option>5</option>
-                      </select> closest facilities to the input point.</b> 
+                      </select> closest facilities to the input point.</p><p>Below is the distance in miles<p/>
                       <div id="directionsDiv"></div>
                       <br />
                     </div>
