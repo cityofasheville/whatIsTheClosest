@@ -210,12 +210,9 @@
           //build an array of route info
           
           var attr = dojo.map(solveResult.directions[index].features,function(feature){
+             
+			 return feature.attributes.length.toPrecision(1);
            
-
-            return feature.attributes.length.toPrecision(1);
-       
-return eval( feature.join('+') ) )
-
           });
           var infoTemplate = new esri.InfoTemplate("Attributes", "${*}");
           
