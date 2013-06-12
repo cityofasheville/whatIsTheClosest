@@ -176,7 +176,7 @@
     function mapClickHandler(evt) {
       clearGraphics();
       dojo.byId("directionsDiv").innerHTML= "";
-      var inPoint = locate();//new esri.geometry.Point(evt.mapPoint.x,evt.mapPoint.y,map.spatialReference);
+      var inPoint = new esri.geometry.Point(evt.mapPoint.x,evt.mapPoint.y,map.spatialReference);
       var location = new esri.Graphic(inPoint);
       incidentsGraphicsLayer.add(location);
       //prompt('',evt.mapPoint.x+'||-'+evt.mapPoint.y);
