@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -91,7 +92,7 @@
  
       
 
-      dojo.connect(map, "onClick", mapClickHandler);
+      dojo.connect(search, "onClick", locate);
       
       params = new esri.tasks.ClosestFacilityParameters();
       params.defaultCutoff= 3.0;
