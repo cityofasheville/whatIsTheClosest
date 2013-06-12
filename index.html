@@ -176,7 +176,7 @@
     function mapClickHandler(evt) {
       clearGraphics();
       dojo.byId("directionsDiv").innerHTML= "";
-      var inPoint = new esri.geometry.Point(evt.mapPoint.x,evt.mapPoint.y,map.spatialReference);
+      var inPoint = locate();//new esri.geometry.Point(evt.mapPoint.x,evt.mapPoint.y,map.spatialReference);
       var location = new esri.Graphic(inPoint);
       incidentsGraphicsLayer.add(location);
       //prompt('',evt.mapPoint.x+'||-'+evt.mapPoint.y);
@@ -210,9 +210,12 @@
           //build an array of route info
           
           var attr = dojo.map(solveResult.directions[index].features,function(feature){
-             
-			 return feature.attributes.length.toPrecision(1);
            
+
+            return feature.attributes.length.toPrecision(1);
+       
+
+
           });
           var infoTemplate = new esri.InfoTemplate("Attributes", "${*}");
           
