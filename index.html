@@ -92,7 +92,7 @@
       
 
       dojo.connect(search, "onClick", locate);    
-	  dojo.connect(map, "onMouseDown", mapClickHandler);
+	  dojo.connect(map, "onClick", mapClickHandler);
       
       params = new esri.tasks.ClosestFacilityParameters();
       params.defaultCutoff= 3.0;
