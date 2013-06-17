@@ -145,21 +145,21 @@
         map.addLayer(facilitiesGraphicsLayer);
         //alert(map.spatialReference.wkid)
         //facilitiesGraphicsLayer.add(new esri.Graphic(new esri.geometry.Point(-82.5488,35.593,map.spatialReference)));
-        facilitiesGraphicsLayer.add(new esri.Graphic(new esri.geometry.Point(942559.3131500304,690578.6353148625,map.spatialReference)));
-        facilitiesGraphicsLayer.add(new esri.Graphic(new esri.geometry.Point(941771.9345977657,691136.1560300763,map.spatialReference)));
-        facilitiesGraphicsLayer.add(new esri.Graphic(new esri.geometry.Point(941710.1738841726,692662.5279517361,map.spatialReference))); 
-        facilitiesGraphicsLayer.add(new esri.Graphic(new esri.geometry.Point(943977.6743689503,690774.4147076021,map.spatialReference))); 
-        facilitiesGraphicsLayer.add(new esri.Graphic(new esri.geometry.Point(943995.3202871197,689256.8657450271,map.spatialReference))); 
+        //facilitiesGraphicsLayer.add(new esri.Graphic(new esri.geometry.Point(942559.3131500304,690578.6353148625,map.spatialReference)));
+        //facilitiesGraphicsLayer.add(new esri.Graphic(new esri.geometry.Point(941771.9345977657,691136.1560300763,map.spatialReference)));
+        //facilitiesGraphicsLayer.add(new esri.Graphic(new esri.geometry.Point(941710.1738841726,692662.5279517361,map.spatialReference))); 
+        //facilitiesGraphicsLayer.add(new esri.Graphic(new esri.geometry.Point(943977.6743689503,690774.4147076021,map.spatialReference))); 
+        //facilitiesGraphicsLayer.add(new esri.Graphic(new esri.geometry.Point(943995.3202871197,689256.8657450271,map.spatialReference))); 
    
-        var facilities = new esri.tasks.FeatureSet();
-        facilities.features = facilitiesGraphicsLayer.graphics;
+        //var facilities = new esri.tasks.FeatureSet();
+        //facilities.features = facilitiesGraphicsLayer.graphics;
         
-        params.facilities = facilities;
+        //params.facilities = facilities;
         params.outSpatialReference = map.spatialReference;
        
        
       });
-      closestFacilityTask = new esri.tasks.ClosestFacilityTask("http://coa-gis-imagery/COA_Internal_ArcGIS/rest/services/Publish/test_route/NAServer/Closest Facility");
+      closestFacilityTask = new esri.tasks.ClosestFacilityTask("http://coa-gis-imagery/COA_Internal_ArcGIS/rest/services/Publish/test_route/NAServer/ClosestFireStation");
 
       locator = new esri.tasks.Locator("http://gis.ashevillenc.gov/COA_ArcGIS_Server/rest/services/Buncombe_Address_Point/GeocodeServer");
       dojo.connect(locator, "onAddressToLocationsComplete", showResults);
