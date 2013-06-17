@@ -92,7 +92,7 @@
       
 
       dojo.connect(search, "onClick", locate);    
-	  dojo.connect(map, "onClick", mapClickHandler);
+	  dojo.connect(map, "onMouseDown", mapClickHandler);
       
       params = new esri.tasks.ClosestFacilityParameters();
       params.defaultCutoff= 3.0;
@@ -208,6 +208,35 @@
         dojo.byId("directionsDiv").innerHTML = esri.substitute(evt.graphic.attributes,"${*}");
 
       });
+	  
+	  function rgeo(geom) {
+      clearGraphics();
+      dojo.byId("directionsDiv").innerHTML= "";
+      var inPoint = new esri.geometry.Point(geom.x,geom.y,map.spatialReference);
+      var location = new esri.Graphic(inPoint);
+      incidentsGraphicsLayer.add(location);
+      //prompt('',evt.mapPoint.x+'||-'+evt.mapPoint.y);
+      var features = [];
+      features.push(location);
+      var incidents = new esri.tasks.FeatureSet();
+      incidents.features = features;
+      params.incidents = incidents;
+      
+      map.graphics.enableMouseEvents();
+     
+      dojo.connect(routeGraphicLayer,"onMouseOver", function(evt){
+        //clear existing directions and highlight symbol
+        map.graphics.clear();
+        
+        dojo.byId("directionsDiv").innerHTML= "Hover over the route to view directions";
+        
+        var highlightSymbol = new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new dojo.Color([0,255,255],0.25), 4.5);
+        var highlightGraphic = new esri.Graphic(evt.graphic.geometry,highlightSymbol);
+        
+        map.graphics.add(highlightGraphic);
+        dojo.byId("directionsDiv").innerHTML = esri.substitute(evt.graphic.attributes,"${*}");
+
+      });
 
       //solve 
       closestFacilityTask.solve(params,function(solveResult){
@@ -268,6 +297,7 @@ alert("Please Click within the red square for the closest facility")
             console.log(candidate.location);
             var attributes = { address: candidate.address, score:candidate.score, locatorName:candidate.attributes.Loc_name };   
             geom = candidate.location;
+			rgeo(geom);
             var graphic = new esri.Graphic(geom, symbol, attributes, infoTemplate);
             //add a graphic to the map at the geocoded location
             map.graphics.add(graphic);
@@ -331,10 +361,10 @@ alert("Please Click within the red square for the closest facility")
                        <p> Enter an input address and the application will use the sample address locator to return the location for 
                         street addresses in the United States. </p>
                         <br />Address:
-                        <input type="text" class="span9" id="address" value="" />
+                        <input type="text" class="span9" id="address" value="70 court pz" />
                         <!-- <textarea type="text" id="address"/>70 court pz</textArea> -->
                         <br />Zip:
-                        <input type="text" class="span2" id="zone" value="" />
+                        <input type="text" class="span2" id="zone" value="28801" />
                         <!-- <textarea type="text" id="zone"/>28801</textArea> -->
                         <br />
                         <!--
