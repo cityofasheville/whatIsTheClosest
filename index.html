@@ -166,14 +166,6 @@
       dojo.connect(locator, "onAddressToLocationsComplete", showResults);
                                                                 
     }
-    //Round the distance to the nearest hundredth of a unit
-    function FormatDistance(dist, units) {
-        var d = Math.round(dist * 100) / 100;
-        if (d == 0) {
-            return "";
-        }
-        return d + " " + units;
-    }    
     function clearGraphics() {
       //clear graphics
       dojo.byId("directionsDiv").innerHTML= "";
@@ -230,9 +222,6 @@
           routeGraphicLayer.add(route);
           dojo.byId("directionsDiv").innerHTML = "Hover over the route to view directions";
         });
-        
-                
-        dojo.byId("directionsDiv").innerHTML = '';
         
         //display any messages
         if(solveResult.messages.length > 0){
@@ -309,15 +298,12 @@
       //solve 
       closestFacilityTask.solve(params,function(solveResult){
         var directions = solveResult.directions;
-        //var  direct = solveResult.routeResults[0].directions;
-        alert(directions);
-         
-         
+      
         dojo.forEach(solveResult.routes, function(route, index){
           //build an array of route info
           
           var attr = dojo.map(solveResult.directions[index].features,function(feature){
-             
+            
             return feature.attributes.text;
           });
           var infoTemplate = new esri.InfoTemplate("Attributes", "${*}");
@@ -326,7 +312,7 @@
           route.setAttributes(attr);
           
           routeGraphicLayer.add(route);
-          dojo.byId("directionsDiv").innerHTML = "Hover over the route to view directions!";
+          dojo.byId("directionsDiv").innerHTML = "Hover over the route to view directions";
         });
         
         //display any messages
@@ -337,8 +323,7 @@
       
       closestHydrantTask.solve(params,function(solveResult){
         var directions = solveResult.directions;
-
-         
+      
         dojo.forEach(solveResult.routes, function(route, index){
           //build an array of route info
           
