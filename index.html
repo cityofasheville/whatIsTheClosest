@@ -206,7 +206,9 @@
       //solve 
       closestFacilityTask.solve(params,function(solveResult){
         var directions = solveResult.directions;
-      
+        
+        alert(solveResult.directions[0].totalLength)
+        
         dojo.forEach(solveResult.routes, function(route, index){
           //build an array of route info
           
