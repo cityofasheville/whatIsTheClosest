@@ -166,15 +166,14 @@
       dojo.connect(locator, "onAddressToLocationsComplete", showResults);
                                                                 
     }
-//Round the distance to the nearest hundredth of a unit
-function FormatDistance(dist, units) {
-    var d = Math.round(dist * 100) / 100;
-    if (d == 0) {
-        return "";
-    }
-    return d + " " + units;
-}
-    
+    //Round the distance to the nearest hundredth of a unit
+    function FormatDistance(dist, units) {
+        var d = Math.round(dist * 100) / 100;
+        if (d == 0) {
+            return "";
+        }
+        return d + " " + units;
+    }    
     function clearGraphics() {
       //clear graphics
       dojo.byId("directionsDiv").innerHTML= "";
@@ -214,32 +213,32 @@ function FormatDistance(dist, units) {
 
       //solve 
       closestFacilityTask.solve(params,function(solveResult){
-       //var directions = solveResult.directions;
+        var directions = solveResult.directions;
       
-        //dojo.forEach(solveResult.routes, function(route, index){
-        //  //build an array of route info
-        //  
-        ///  var attr = dojo.map(solveResult.directions[index].features,function(feature){
-        //    
-        //    return feature.attributes.text;
-        //  });
-        //  var infoTemplate = new esri.InfoTemplate("Attributes", "${*}");
-        //  
-        //  route.setInfoTemplate(infoTemplate);
-        //  route.setAttributes(attr);
-        //  
-        //  routeGraphicLayer.add(route);
-        //  dojo.byId("directionsDiv").innerHTML = "Hover over the route to view directions";
-        //});
+        dojo.forEach(solveResult.routes, function(route, index){
+          //build an array of route info
+          
+          var attr = dojo.map(solveResult.directions[index].features,function(feature){
+            
+            return feature.attributes.text;
+          });
+          var infoTemplate = new esri.InfoTemplate("Attributes", "${*}");
+          
+          route.setInfoTemplate(infoTemplate);
+          route.setAttributes(attr);
+          
+          routeGraphicLayer.add(route);
+          dojo.byId("directionsDiv").innerHTML = "Hover over the route to view directions";
+        });
         
-        var distDirec = solveResult.routeResults[0].directions;
+        distDirec = solveResult.routeResults[0].directions;
         
-        dojo.byId("directionsDiv").innerHTML = FormatDistance(distDirec.totalLength, "miles");
+        dojo.byId("directionsDiv").innerHTML = '';
         
         //display any messages
-        //if(solveResult.messages.length > 0){
-        //  dojo.byId("directionsDiv").innerHTML = "<b>Error:</b> " + solveResult.messages[0];
-        //}      
+        if(solveResult.messages.length > 0){
+          dojo.byId("directionsDiv").innerHTML = "<b>Error:</b> " + solveResult.messages[0];
+        }      
       });
 
         
@@ -310,32 +309,28 @@ function FormatDistance(dist, units) {
 
       //solve 
       closestFacilityTask.solve(params,function(solveResult){
-        //var directions = solveResult.directions;
+        var directions = solveResult.directions;
       
-       // dojo.forEach(solveResult.routes, function(route, index){
+        dojo.forEach(solveResult.routes, function(route, index){
           //build an array of route info
           
-        //  var attr = dojo.map(solveResult.directions[index].features,function(feature){
+          var attr = dojo.map(solveResult.directions[index].features,function(feature){
             
-        //    return feature.attributes.text;
-        //  });
-        //  var infoTemplate = new esri.InfoTemplate("Attributes", "${*}");
+            return feature.attributes.text;
+          });
+          var infoTemplate = new esri.InfoTemplate("Attributes", "${*}");
           
-        //  route.setInfoTemplate(infoTemplate);
-        //  route.setAttributes(attr);
+          route.setInfoTemplate(infoTemplate);
+          route.setAttributes(attr);
           
-        //  routeGraphicLayer.add(route);
-        //  dojo.byId("directionsDiv").innerHTML = "Hover over the route to view directions";
-        //});
+          routeGraphicLayer.add(route);
+          dojo.byId("directionsDiv").innerHTML = "Hover over the route to view directions";
+        });
         
         //display any messages
-        //if(solveResult.messages.length > 0){
-        //  dojo.byId("directionsDiv").innerHTML = "<b>Error:</b> " + solveResult.messages[0];
-        //}      
-              var distDirec = solveResult.routeResults[0].directions;
-        
-        dojo.byId("directionsDiv").innerHTML = FormatDistance(distDirec.totalLength, "miles");
-
+        if(solveResult.messages.length > 0){
+          dojo.byId("directionsDiv").innerHTML = "<b>Error:</b> " + solveResult.messages[0];
+        }      
       });
       
       closestHydrantTask.solve(params,function(solveResult){
