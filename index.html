@@ -160,7 +160,8 @@
        
       });
       closestFacilityTask = new esri.tasks.ClosestFacilityTask("http://coa-gis-imagery/COA_Internal_ArcGIS/rest/services/Publish/test_route/NAServer/ClosestFireStation");
-
+      closestHydrantTask = new esri.tasks.ClosestFacilityTask("http://coa-gis-imagery/COA_Internal_ArcGIS/rest/services/Publish/test_route/NAServer/ClosestHydrant");
+         
       locator = new esri.tasks.Locator("http://gis.ashevillenc.gov/COA_ArcGIS_Server/rest/services/Buncombe_Address_Point/GeocodeServer");
       dojo.connect(locator, "onAddressToLocationsComplete", showResults);
                                                                 
@@ -296,6 +297,31 @@
 
       //solve 
       closestFacilityTask.solve(params,function(solveResult){
+        var directions = solveResult.directions;
+      
+        dojo.forEach(solveResult.routes, function(route, index){
+          //build an array of route info
+          
+          var attr = dojo.map(solveResult.directions[index].features,function(feature){
+            
+            return feature.attributes.text;
+          });
+          var infoTemplate = new esri.InfoTemplate("Attributes", "${*}");
+          
+          route.setInfoTemplate(infoTemplate);
+          route.setAttributes(attr);
+          
+          routeGraphicLayer.add(route);
+          dojo.byId("directionsDiv").innerHTML = "Hover over the route to view directions";
+        });
+        
+        //display any messages
+        if(solveResult.messages.length > 0){
+          dojo.byId("directionsDiv").innerHTML = "<b>Error:</b> " + solveResult.messages[0];
+        }      
+      });
+      
+      closestHydrantTask.solve(params,function(solveResult){
         var directions = solveResult.directions;
       
         dojo.forEach(solveResult.routes, function(route, index){
