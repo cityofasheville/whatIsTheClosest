@@ -310,7 +310,10 @@
       //solve 
       closestFacilityTask.solve(params,function(solveResult){
         var directions = solveResult.directions;
-       
+        var  direct = solveResult.routeResults[0].directions;
+        alert(direct.totalLength);
+         
+         
         dojo.forEach(solveResult.routes, function(route, index){
           //build an array of route info
           
@@ -335,8 +338,8 @@
       
       closestHydrantTask.solve(params,function(solveResult){
         var directions = solveResult.directions;
+
          
-         alert(directions.totalLength);
         dojo.forEach(solveResult.routes, function(route, index){
           //build an array of route info
           
