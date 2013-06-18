@@ -310,7 +310,7 @@
       closestFacilityTask.solve(params,function(solveResult){
         var directions = solveResult.directions;
         //var  direct = solveResult.routeResults[0].directions;
-        alert(direct.totalLength);
+        alert(directions);
          
          
         dojo.forEach(solveResult.routes, function(route, index){
