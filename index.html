@@ -232,7 +232,7 @@ function FormatDistance(dist, units) {
         //  dojo.byId("directionsDiv").innerHTML = "Hover over the route to view directions";
         //});
         
-        distDirec = solveResult.routeResults[0].directions;
+        var distDirec = solveResult.routeResults[0].directions;
         
         dojo.byId("directionsDiv").innerHTML = FormatDistance(distDirec.totalLength, "miles");
         
