@@ -317,7 +317,7 @@
           //build an array of route info
           
           var attr = dojo.map(solveResult.directions[index].features,function(feature){
-            
+             
             return feature.attributes.text;
           });
           var infoTemplate = new esri.InfoTemplate("Attributes", "${*}");
@@ -326,7 +326,7 @@
           route.setAttributes(attr);
           
           routeGraphicLayer.add(route);
-          dojo.byId("directionsDiv").innerHTML = "Hover over the route to view directions";
+          dojo.byId("directionsDiv").innerHTML = "Hover over the route to view directions!";
         });
         
         //display any messages
