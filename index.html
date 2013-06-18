@@ -234,7 +234,7 @@ function FormatDistance(dist, units) {
         
         distDirec = solveResult.routeResults[0].directions;
         
-        dojo.byId("directionsDiv").innerHTML = FormatDistance(directions.totalLength, "miles");
+        dojo.byId("directionsDiv").innerHTML = FormatDistance(distDirec.totalLength, "miles");
         
         //display any messages
         if(solveResult.messages.length > 0){
