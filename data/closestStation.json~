@@ -1,4 +1,4 @@
-[{
+{
     "routes": {
         "spatialReference": {
             "wkid": 2264
@@ -156,14 +156,4 @@
         }
     ],
     "messages": []
-<<<<<<< HEAD
 }
-<<<<<<< HEAD
-=======
-
-
-
->>>>>>> 0f90ed03982767a776e78b42f3dd834e8bf33423
-=======
-}]
->>>>>>> fix json dat
