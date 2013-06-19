@@ -58,7 +58,7 @@
        $('#results').append('<p>Entered zip : ' + ZipStr + '</p>');
        
        $.ajax({
-           url: 'urlStr',
+           url: urlStr,
            dataType: 'json',
            jsonpCallback: 'MyJSONPCallback', // specify the callback name if you're hard-coding it
            jsonp : "callback",
