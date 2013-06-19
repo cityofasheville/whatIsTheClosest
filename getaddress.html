@@ -52,17 +52,18 @@
        addressStr = $('#address').val();
        ZipStr = $('#zone').val();
        var pt = '';
-       var result;
+       var retVal;
        
        $('#results').html('<p>Entered address : ' + addressStr + '</p>');
        $('#results').append('<p>Entered zip : ' + ZipStr + '</p>');
 
         $.getJSON(urlStr, function(result){
+            retVal = result;
             pt = getPoint(result);
             UpdateResults(result);
         });
         
-        pt = getPoint(result);
+        pt = getPoint(retVal);
         alert(pt);
         return pt;
    }
