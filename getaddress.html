@@ -57,13 +57,13 @@
        $('#results').html('<p>Entered address : ' + addressStr + '</p>');
        $('#results').append('<p>Entered zip : ' + ZipStr + '</p>');
        $.ajax({
-           url: 'http://anotherdomain.com/page.json?format=json',
+           url: urlStr,
            dataType: 'json',
            jsonpCallback: 'MyJSONPCallback', // specify the callback name if you're hard-coding it
            success: function(data){
-            pt = getPoint(result);
-            UpdateResults(result);
-            return pt;                      
+           pt = getPoint(result);
+           UpdateResults(result);
+           return pt;                      
            // we make a successful JSONP call!
            }
        });
