@@ -97,32 +97,28 @@
 
       <h1>Bootstrap starter template</h1>
       <p>Use this document as a way to quick start any new project.<br> All you get is this message and a barebones HTML document.</p>
-  
+
         <div class="span9">
           <div class="row-fluid">
             <div class="span9" >
               <h2>Search</h2>
               <p>Put search here</p>
-    
                        <p> Enter an input address and the application will use the sample address locator to return the location for 
                         street addresses in the United States. </p>
                         <br />Address:
-                        <input type="text" class="span9" id="address" value="70 court pz" />
-                       <br />Zip:
-                        <input type="text" class="span2" id="zone" value="28801" />
-                        <br />                    
-                    </div>
+                        <input type="text" class="span9" id="Text1" value="70 court pz" />
+                        <br />Zip:
+                        <input type="text" class="span2" id="Text2" value="28801" />
+                        <br />
 
-                    <div id="map" class="roundedCorners shadow" data-dojo-type="dijit.layout.ContentPane" data-dojo-props="region:'center'">
-                    </div>
-                    
-              <div id="search"></div>
-              <p>
-              <button type="submit" class="btn" id="getdata" onclick="getAddress('data/address.json',$('#address').val(),$('#zone').val())" >Find it!</button>
-              </p>
+              <div id="Div2"></div>
+              <button type="submit" class="btn" id="Button1" onclick="getAddress('data/address.json',$('#address').val(),$('#zone').val())" >Find it!</button>
             </div><!--/span-->
            </div>
         </div>
+        
+  
+
         
   
         <div class="span9">
