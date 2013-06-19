@@ -36,13 +36,12 @@
    <! --<script type="text/javascript" src="/jquery/jquery-1.3.2.min.js"></script> -->
    <script src="js/jquery.js"></script>
    <script type="text/javascript" language="javascript">
-   <script type="text/javascript" language="javascript">
    $(document).ready(function() {
       $("#getdata").click(function(event){
           $.getJSON('data/address.json', function(jd) {
-             $('#results').html('<p> Name: ' + jd.candidates[0].address + '</p>');
-             $('#results').append('<p>Age : ' + jd.candidates[0].score+ '</p>');
-             $('#results').append('<p> Sex: ' + jd.candidates[0].location+ '</p>');
+             $('#results').html('<p> address: ' + jd.candidates[0].address + '</p>');
+             $('#results').append('<p>Score : ' + jd.candidates[0].score+ '</p>');
+             $('#results').append('<p>location: ' + jd.candidates[0].location[0].x + ',' + jd.candidates[0].location[0].y + '</p>');
           });
       });
    });
