@@ -33,10 +33,12 @@
     <![endif]-->
      <script type="text/javascript" src="http://cdn.leafletjs.com/leaflet-0.5/leaflet.js"></script>
     <!-- <style type="text/javascript">#map { height: 180px; }</style> -->
-
+   <script type="text/javascript" 
+   src="/jquery/jquery-1.3.2.min.js"></script>
+   <script type="text/javascript" language="javascript">
    <script type="text/javascript" language="javascript">
    $(document).ready(function() {
-      $("#driver").click(function(event){
+      $("#getdata").click(function(event){
           $.getJSON('data/address.json', function(jd) {
              $('#results').html('<p> Name: ' + jd.candidates[0].address + '</p>');
              $('#results').append('<p>Age : ' + jd.candidates[0].score+ '</p>');
@@ -108,7 +110,7 @@
 
 
               <div id="search"></div>
-              <p><button type="submit" class="btn" onclick="load data" >Find it!</button></p>
+              <p><button type="submit" class="btn" id="getdata" >Find it!</button></p>
             </div><!--/span-->
            </div>
         </div>
