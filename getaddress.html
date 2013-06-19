@@ -37,15 +37,26 @@
    <script type="text/javascript" src="js/jquery.js"></script>
    <script type="text/javascript" language="javascript">
    
-    
+   function retJson(urlStr){
+        var retVal = $.getJSON(urlStr);
+        return retVal;
+   }
+   function UpdateResults(jd,idStr){
+         $('#results').append('<p>Address: ' + jd.candidates[0].address + '</p>');
+         $('#results').append('<p>Score : ' + jd.candidates[0].score+ '</p>');
+         $('#results').append('<p>Location: ' + jd.candidates[0].location.x + ',' + jd.candidates[0].location.y + '</p>');   
+   }
+   function getPoint(jd){
+       alert(jd.candidates[0].location.x + ',' + jd.candidates[0].location.y);
+       var retval = jd.candidates[0].location.x + ',' + jd.candidates[0].location.y ;
+   }
+   
    function getAddress(urlStr,addressStr,ZipStr){
        $('#results').html('<p>Entered address : ' + addressStr + '</p>');
        $('#results').append('<p>Entered zip : ' + ZipStr + '</p>');
-       $.getJSON(urlStr, function(jd) {
-         $('#results').append('<p>Address: ' + jd.candidates[0].address + '</p>');
-         $('#results').append('<p>Score : ' + jd.candidates[0].score+ '</p>');
-         $('#results').append('<p>Location: ' + jd.candidates[0].location.x + ',' + jd.candidates[0].location.y + '</p>');
-       });
+       var jd = retJson(urlStr);
+       var pt = getPoint(jd);
+       UpdateResults(jd);
    }
    </script>
   
