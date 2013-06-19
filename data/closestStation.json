@@ -1,0 +1,159 @@
+{
+    "routes": {
+        "spatialReference": {
+            "wkid": 2264
+        },
+        "features": [
+            {
+                "attributes": {
+                    "ObjectID": 1,
+                    "FacilityID": 1,
+                    "FacilityRank": 1,
+                    "Name": "Location 1 - AFD 1",
+                    "IncidentCurbApproach": 1,
+                    "FacilityCurbApproach": 2,
+                    "IncidentID": 1,
+                    "Total_Distance": 0.155658471857229,
+                    "Shape_Length": 821.876620270171
+                },
+                "geometry": {
+                    "paths": [
+                        [
+                            [
+                                945429.740138054,
+                                690503.774696395
+                            ],
+                            [
+                                945441.669904217,
+                                690439.755467474
+                            ],
+                            [
+                                945446.253884554,
+                                690414.479599401
+                            ],
+                            [
+                                945446.550799966,
+                                690413.359522894
+                            ],
+                            [
+                                945166.522816718,
+                                690351.115552887
+                            ],
+                            [
+                                944962.807672977,
+                                690305.29248181
+                            ],
+                            [
+                                944945.72929506,
+                                690301.526741311
+                            ],
+                            [
+                                944939.47996372,
+                                690325.358386561
+                            ],
+                            [
+                                944909.922936216,
+                                690438.865049317
+                            ],
+                            [
+                                944885.66445455,
+                                690435.007445484
+                            ],
+                            [
+                                944840.832523227,
+                                690427.405426562
+                            ],
+                            [
+                                944836.060551137,
+                                690427.015991643
+                            ]
+                        ]
+                    ]
+                }
+            }
+        ]
+    },
+    "directions": [
+        {
+            "routeId": 1,
+            "routeName": "Location 1 - AFD 1",
+            "summary": {
+                "totalLength": 0.155658471857229,
+                "totalTime": 0.433333333333333,
+                "totalDriveTime": 0.448755490850783,
+                "envelope": {
+                    "xmin": 944836.060428413,
+                    "ymin": 690301.526745096,
+                    "xmax": 945446.550808996,
+                    "ymax": 690503.774667575,
+                    "spatialReference": {
+                        "wkid": 2264
+                    }
+                }
+            },
+            "features": [
+                {
+                    "attributes": {
+                        "length": 0,
+                        "time": 0,
+                        "text": "Start at Location 1",
+                        "ETA": -2209161600000,
+                        "maneuverType": "esriDMTDepart"
+                    },
+                    "compressedGeometry": "+1+sr8m+l2a8+0+0"
+                },
+                {
+                    "attributes": {
+                        "length": 0.0174182165806407,
+                        "time": 0.0522546497419222,
+                        "text": "Go south on DAVIDSON DR toward MARJORIE ST",
+                        "ETA": -2209161600000,
+                        "maneuverType": "esriDMTStraight"
+                    },
+                    "compressedGeometry": "+1+sr8m+l2a8+h-2r"
+                },
+                {
+                    "attributes": {
+                        "length": 0.097188661180534,
+                        "time": 0.291565983541602,
+                        "text": "Turn right on MARJORIE ST",
+                        "ETA": -2209161600000,
+                        "maneuverType": "esriDMTTurnRight"
+                    },
+                    "compressedGeometry": "+1+sr97+l27d-fl-3f"
+                },
+                {
+                    "attributes": {
+                        "length": 0.0268805415353511,
+                        "time": 0.0806416246060532,
+                        "text": "Turn right on S SPRUCE ST",
+                        "ETA": -2209161600000,
+                        "maneuverType": "esriDMTTurnRight"
+                    },
+                    "compressedGeometry": "+1+sqpi+l23u-14+49"
+                },
+                {
+                    "attributes": {
+                        "length": 0.0141710525607031,
+                        "time": 0.0242932329612053,
+                        "text": "Turn left on COURT PZ",
+                        "ETA": -2209161600000,
+                        "maneuverType": "esriDMTTurnLeft"
+                    },
+                    "compressedGeometry": "+1+sqoe+l287-2a-c"
+                },
+                {
+                    "attributes": {
+                        "length": 0,
+                        "time": 0,
+                        "text": "Finish at AFD 1",
+                        "ETA": -2209161600000,
+                        "maneuverType": "esriDMTStop"
+                    },
+                    "compressedGeometry": "+1+sqm4+l27r+0+0"
+                }
+            ]
+        }
+    ],
+    "messages": []
+}
