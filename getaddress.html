@@ -52,6 +52,7 @@
        addressStr = $('#address').val();
        ZipStr = $('#zone').val();
        var pt = '';
+       var result;
        
        $('#results').html('<p>Entered address : ' + addressStr + '</p>');
        $('#results').append('<p>Entered zip : ' + ZipStr + '</p>');
@@ -61,6 +62,7 @@
             UpdateResults(result);
         });
         
+        pt = getPoint(result);
         alert(pt);
         return pt;
    }
