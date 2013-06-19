@@ -38,9 +38,12 @@
    <script type="text/javascript" language="javascript">
    
    function retJson(urlStr){
-        var retVal = $.getJSON(urlStr);
-        alert(urlStr);
-         alert(retVal);
+        var retVal = $.getJSON(urlStr, function(result)
+                {
+                    return result
+                }
+        );
+        alert(retVal.candidates[0].location.x + ',' + retVal.candidates[0].location.y);
         return retVal;
    }
    function UpdateResults(jd,idStr){
@@ -49,14 +52,19 @@
          $('#results').append('<p>Location: ' + jd.candidates[0].location.x + ',' + jd.candidates[0].location.y + '</p>');   
    }
    function getPoint(jd){
-       alert(jd.candidates[0].location.x + ',' + jd.candidates[0].location.y);
+       
        var retval = jd.candidates[0].location.x + ',' + jd.candidates[0].location.y ;
    }
    
-   function getAddress(urlStr,addressStr,ZipStr){
+   function getAddress(urlStr,addressID,ZipID){
+       addressStr = $('#address').val();
+       ZipStr = $('#zone').val();
+       
        $('#results').html('<p>Entered address : ' + addressStr + '</p>');
        $('#results').append('<p>Entered zip : ' + ZipStr + '</p>');
+       
        var jd = retJson(urlStr);
+       alert(jd);
        var pt = getPoint(jd);
        UpdateResults(jd);
    }
@@ -114,13 +122,13 @@
                        <p> Enter an input address and the application will use the sample address locator to return the location for 
                         street addresses in the United States. </p>
                         <br />Address:
-                        <input type="text" class="span9" id="Text1" value="70 court pz" />
+                        <input type="text" class="span9" id="address" value="70 court pz" />
                         <br />Zip:
-                        <input type="text" class="span2" id="Text2" value="28801" />
+                        <input type="text" class="span2" id="zone" value="28801" />
                         <br />
 
               <div id="Div2"></div>
-              <button type="submit" class="btn" id="Button1" onclick="getAddress('data/address.json',$('#address').val(),$('#zone').val())" >Find it!</button>
+              <button type="submit" class="btn" id="Button1" onclick="getAddress('data/address.json','address','zone')" >Find it!</button>
             </div><!--/span-->
            </div>
         </div>
