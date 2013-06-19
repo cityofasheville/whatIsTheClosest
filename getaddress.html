@@ -39,18 +39,13 @@
    
     
    function getAddress(urlStr,addressStr,ZipStr){
-       //$(document).ready(function() {
-         // $("#getdata").click(function(event){
-              $.getJSON(urlStr, function(jd) {
-                 $('#results').html('<p>Entered address : ' + addressStr + '</p>');
-                 $('#results').append('<p>Entered zip : ' + ZipStr + '</p>');
-                 $('#results').append('<p>Address: ' + jd.candidates[0].address + '</p>');
-                 $('#results').append('<p>Score : ' + jd.candidates[0].score+ '</p>');
-                 $('#results').append('<p>Location: ' + jd.candidates[0].location.x + ',' + jd.candidates[0].location.y + '</p>');
-
-              });
-        //  });
-       //});
+       $('#results').html('<p>Entered address : ' + addressStr + '</p>');
+       $('#results').append('<p>Entered zip : ' + ZipStr + '</p>');
+       $.getJSON(urlStr, function(jd) {
+         $('#results').append('<p>Address: ' + jd.candidates[0].address + '</p>');
+         $('#results').append('<p>Score : ' + jd.candidates[0].score+ '</p>');
+         $('#results').append('<p>Location: ' + jd.candidates[0].location.x + ',' + jd.candidates[0].location.y + '</p>');
+       });
    }
    </script>
   
