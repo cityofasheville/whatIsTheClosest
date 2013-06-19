@@ -34,9 +34,17 @@
      <script type="text/javascript" src="http://cdn.leafletjs.com/leaflet-0.5/leaflet.js"></script>
     <!-- <style type="text/javascript">#map { height: 180px; }</style> -->
 
-  <link rel="stylesheet" href="http://serverapi.arcgisonline.com/jsapi/arcgis/3.5/js/dojo/dijit/themes/claro/claro.css">
-  <link rel="stylesheet" href="http://serverapi.arcgisonline.com/jsapi/arcgis/3.5/js/esri/css/esri.css">
-  <link rel="stylesheet" href="http://serverapi.arcgisonline.com/jsapi/arcgis/3.5/js/dojo/dojox/layout/resources/FloatingPane.css">
+   <script type="text/javascript" language="javascript">
+   $(document).ready(function() {
+      $("#driver").click(function(event){
+          $.getJSON('data/address.json', function(jd) {
+             $('#results').html('<p> Name: ' + jd.candidates[0].address + '</p>');
+             $('#results').append('<p>Age : ' + jd.candidates[0].score+ '</p>');
+             $('#results').append('<p> Sex: ' + jd.candidates[0].location+ '</p>');
+          });
+      });
+   });
+   </script>
   
   <style> 
     body,html,#main{margin:0;padding:0;height:100%;width:100%;}
@@ -100,7 +108,7 @@
 
 
               <div id="search"></div>
-              <p><button type="submit" class="btn" onclick="locate()" >Find it!</button></p>
+              <p><button type="submit" class="btn" onclick="load data" >Find it!</button></p>
             </div><!--/span-->
            </div>
         </div>
