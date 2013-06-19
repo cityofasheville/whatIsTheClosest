@@ -41,7 +41,7 @@
    function getAddress(urlStr,addressStr,ZipStr){
        //$(document).ready(function() {
          // $("#getdata").click(function(event){
-              $.getJSON(urlStr, function(urlStr) {
+              $.getJSON(urlStr, function(jd) {
                  $('#results').html('<p>Entered address : ' + addressStr + '</p>');
                  $('#results').append('<p>Entered zip : ' + ZipStr + '</p>');
                  $('#results').append('<p>Address: ' + jd.candidates[0].address + '</p>');
@@ -113,10 +113,13 @@
                         <br />                    
                     </div>
 
-
+                    <div id="map" class="roundedCorners shadow" data-dojo-type="dijit.layout.ContentPane" data-dojo-props="region:'center'">
+                    </div>
+                    
               <div id="search"></div>
               <p>
-              <button type="submit" class="btn" id="getdata" onclick="getAddress('data/address.json',$('#address').val(),$('#zone').val())" >Find it!</button></p>
+              <button type="submit" class="btn" id="getdata" onclick="getAddress('data/address.json',$('#address').val(),$('#zone').val())" >Find it!</button>
+              </p>
             </div><!--/span-->
            </div>
         </div>
