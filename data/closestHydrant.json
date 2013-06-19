@@ -1,4 +1,4 @@
-[{
+{
     "routes": {
         "spatialReference": {
             "wkid": 2264
@@ -1183,6 +1183,7 @@
     ]
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 }
 =======
 }
@@ -1190,3 +1191,6 @@
 =======
 }]
 >>>>>>> fix json dat
+=======
+}
+>>>>>>> fix json data

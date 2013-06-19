@@ -1,4 +1,4 @@
-{
+[{
     "routes": {
         "spatialReference": {
             "wkid": 2264
@@ -1181,4 +1181,4 @@
             "description": "Location \"657\" in \"Facilities\" is unlocated."
         }
     ]
-}
+}]

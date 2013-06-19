@@ -1,4 +1,4 @@
-{
+[{
     "routes": {
         "spatialReference": {
             "wkid": 2264
@@ -156,4 +156,4 @@
         }
     ],
     "messages": []
-}
+}]
