@@ -42,12 +42,10 @@
          $('#results').append('<p>Address: ' + jd.candidates[0].address + '</p>');
          $('#results').append('<p>Score : ' + jd.candidates[0].score+ '</p>');
          $('#results').append('<p>Location: ' + jd.candidates[0].location.x + ',' + jd.candidates[0].location.y + '</p>');
-		  $('#results').append('<p><b><font size = 4 color="red">Total Distance : ' + jd.routes.features[0].attributes.Total_Distance.toPrecision(2) +'&nbsp' + 'miles</p></font>'); 
-		 $('#results').append('<p><b><font size = 4>Starting Location: '+ jd.routes.features[0].attributes.Name + '</p></b></font>');
    }
    
    function getPoint(jd){
-       var retval = jd.candidates[0].location.x + ',' + jd.candidates[0].location.y ;
+      // var retval = jd.candidates[0].location.x + ',' + jd.candidates[0].location.y ;
    }
    
    function getAddress(){
@@ -70,8 +68,31 @@
            success:getResults,
            error:function(data){console.log('ajax failed');}
        });
+}
 
+       function getClosest(jd){
+         
+       addressStr = $('#address').val();
+       ZipStr = $('#zone').val();
+	   xStr=jd.candidates[0].location.x;
+	   yStr=jd.candidates[0].location.y
+       var urlStr = 'http://coa-gis-imagery/COA_Internal_ArcGIS/rest/services/Publish/test_route/NAServer/ClosestFireStation/solveClosestFacility?incidents='+xStr+'%2C'+yStr+'&facilities=&barriers=&polylineBarriers=&polygonBarriers=&travelDirection=esriNATravelDirectionToFacility&defaultCutoff=&defaultTargetFacilityCount=1&outSR=2264&accumulateAttributeNames=Distance&impedanceAttributeName=Distance&restrictionAttributeNames=Use+One+Way&attributeParameterValues=&restrictUTurns=esriNFSBAllowBacktrack&useHierarchy=true&returnDirections=true&returnCFRoutes=true&returnFacilities=false&returnIncidents=false&returnBarriers=false&returnPolylineBarriers=false&returnPolygonBarriers=false&directionsLanguage=en-US&directionsStyleName=NA+Desktop&outputLines=esriNAOutputLineTrueShape&outputGeometryPrecision=&outputGeometryPrecisionUnits=esriUnknownUnits&directionsTimeAttributeName=Drive+Time&directionsLengthUnits=esriNAUMiles&f=pjson';
+       var urlStr = 'http://coa-gis-imagery/COA_Internal_ArcGIS/rest/services/Publish/test_route/NAServer/ClosestFireStation/solveClosestFacility?incidents='+xStr+'%2C'+yStr+'&facilities=&barriers=&polylineBarriers=&polygonBarriers=&travelDirection=esriNATravelDirectionToFacility&defaultCutoff=&defaultTargetFacilityCount=1&outSR=2264&accumulateAttributeNames=Distance&impedanceAttributeName=Distance&restrictionAttributeNames=Use+One+Way&attributeParameterValues=&restrictUTurns=esriNFSBAllowBacktrack&useHierarchy=true&returnDirections=true&returnCFRoutes=true&returnFacilities=false&returnIncidents=false&returnBarriers=false&returnPolylineBarriers=false&returnPolygonBarriers=false&directionsLanguage=en-US&directionsStyleName=NA+Desktop&outputLines=esriNAOutputLineTrueShape&outputGeometryPrecision=&outputGeometryPrecisionUnits=esriUnknownUnits&directionsTimeAttributeName=Drive+Time&directionsLengthUnits=esriNAUMiles&f=pjson';
+       var pt = '';
+       var retVal;
        
+      // $('#results').html('<p>Entered address : ' + addressStr + '</p>');
+     //  $('#results').append('<p>Entered zip : ' + ZipStr + '</p>');
+       
+       $.ajax({
+           url: urlStr,
+           dataType: 'jsonp',
+           crossDomain: true,
+           jsonpCallback: 'MyJSONPCallback', // specify the callback name if you're hard-coding it
+           jsonp : "callback",
+           success:dispResults,
+           error:function(data){console.log('ajax failed');}
+       });
        
    }
    
@@ -79,9 +100,21 @@
             console.log('ajax success');
             pt = getPoint(data);
             UpdateResults(data);
+			getClosest(data);
             return pt;
+			
        }
-  
+   var dispResults = function(data){
+            console.log('ajax success');
+			
+			$('#results').append('<p><b>Total Distance : ' + data.routes.features[0].attributes.Total_Distance.toPrecision(2) +'&nbsp' + 'miles</p>'); 
+		 $('#results').append('<p>Starting Location: '+ data.routes.features[0].attributes.Name + '</p></b>');
+            //pt = getPoint(data);
+            //UpdateResults(data);
+			//getClosest(data);
+            //return pt;
+			
+       }
    </script>
   
   <style>
