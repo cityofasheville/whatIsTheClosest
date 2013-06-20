@@ -60,6 +60,8 @@
        $.ajax({
            url: urlStr,
            dataType: 'json',
+           crossDomain: true,
+           data: data,
            jsonpCallback: 'MyJSONPCallback', // specify the callback name if you're hard-coding it
            jsonp : "callback",
            success:getResults(data),
