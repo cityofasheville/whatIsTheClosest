@@ -91,8 +91,8 @@
  
       
 
-      dojo.connect(search, "onClick", locate);    
-	  dojo.connect(map, "onMouseDown", mapClickHandler);
+      dojo.connect(map, "onClick", mapClickHandler);
+	  dojo.connect(search,"onClick",solveClosest);
       
       params = new esri.tasks.ClosestFacilityParameters();
       params.defaultCutoff= 3.0;
@@ -100,10 +100,7 @@
       params.returnRoutes=true;
       params.returnDirections=true;
       
-      dojo.connect(map, "onLoad", function(map) { 
-	  
-	  
-	  
+      dojo.connect(map, "onLoad", function(map) {
         var facilityPointSymbol = new esri.symbol.SimpleMarkerSymbol(
           esri.symbol.SimpleMarkerSymbol.STYLE_SQUARE, 
           20,
@@ -115,13 +112,13 @@
         ); 
 
         var incidentPointSymbol = new esri.symbol.SimpleMarkerSymbol(
-          esri.symbol.SimpleMarkerSymbol.STYLE_SQUARE, 
+          esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE, 
           16,
           new esri.symbol.SimpleLineSymbol(
             esri.symbol.SimpleLineSymbol.STYLE_SOLID,
             new dojo.Color([89,95,35]), 2
           ),
-          new dojo.Color([153,0,51,0.75])
+          new dojo.Color([130,159,83,0.40])
         );  
 
         incidentsGraphicsLayer = new esri.layers.GraphicsLayer();
@@ -142,35 +139,63 @@
 
         map.addLayer(routeGraphicLayer);
 
-        var facilitiesGraphicsLayer = new esri.layers.GraphicsLayer();
-        var facilityRenderer = new esri.renderer.SimpleRenderer(facilityPointSymbol);
-        facilitiesGraphicsLayer.setRenderer(facilityRenderer);
+        //var facilitiesGraphicsLayer = new esri.layers.GraphicsLayer();
+        //var facilityRenderer = new esri.renderer.SimpleRenderer(facilityPointSymbol);
+        //facilitiesGraphicsLayer.setRenderer(facilityRenderer);
        
-        map.addLayer(facilitiesGraphicsLayer);
+        //map.addLayer(facilitiesGraphicsLayer);
         //alert(map.spatialReference.wkid)
         //facilitiesGraphicsLayer.add(new esri.Graphic(new esri.geometry.Point(-82.5488,35.593,map.spatialReference)));
-        facilitiesGraphicsLayer.add(new esri.Graphic(new esri.geometry.Point(942559.3131500304,690578.6353148625,map.spatialReference)));
-        facilitiesGraphicsLayer.add(new esri.Graphic(new esri.geometry.Point(941771.9345977657,691136.1560300763,map.spatialReference)));
-        facilitiesGraphicsLayer.add(new esri.Graphic(new esri.geometry.Point(941710.1738841726,692662.5279517361,map.spatialReference))); 
-        facilitiesGraphicsLayer.add(new esri.Graphic(new esri.geometry.Point(943977.6743689503,690774.4147076021,map.spatialReference))); 
-        facilitiesGraphicsLayer.add(new esri.Graphic(new esri.geometry.Point(943995.3202871197,689256.8657450271,map.spatialReference))); 
+        //facilitiesGraphicsLayer.add(new esri.Graphic(new esri.geometry.Point(942559.3131500304,690578.6353148625,map.spatialReference)));
+        //facilitiesGraphicsLayer.add(new esri.Graphic(new esri.geometry.Point(941771.9345977657,691136.1560300763,map.spatialReference)));
+        //facilitiesGraphicsLayer.add(new esri.Graphic(new esri.geometry.Point(941710.1738841726,692662.5279517361,map.spatialReference))); 
+        //facilitiesGraphicsLayer.add(new esri.Graphic(new esri.geometry.Point(943977.6743689503,690774.4147076021,map.spatialReference))); 
+        //facilitiesGraphicsLayer.add(new esri.Graphic(new esri.geometry.Point(943995.3202871197,689256.8657450271,map.spatialReference))); 
    
-        var facilities = new esri.tasks.FeatureSet();
-        facilities.features = facilitiesGraphicsLayer.graphics;
+        //var facilities = new esri.tasks.FeatureSet();
+        //facilities.features = facilitiesGraphicsLayer.graphics;
         
-        params.facilities = facilities;
+        params.facilities = '';
         params.outSpatialReference = map.spatialReference;
        
        
       });
-      closestFacilityTask = new esri.tasks.ClosestFacilityTask("http://coa-gis-imagery/COA_Internal_ArcGIS/rest/services/Publish/test_route/NAServer/Closest Facility");
-
-        locator = new esri.tasks.Locator("http://gis.ashevillenc.gov/COA_ArcGIS_Server/rest/services/Buncombe_Address_Point/GeocodeServer");
-        dojo.connect(locator, "onAddressToLocationsComplete", showResults);
+     closestFacilityTask = new esri.tasks.ClosestFacilityTask("http://coa-gis-imagery/COA_Internal_ArcGIS/rest/services/Publish/test_route/NAServer/ClosestFireStation");
+     closestHydrantTask = new esri.tasks.ClosestFacilityTask("http://coa-gis-imagery/COA_Internal_ArcGIS/rest/services/Publish/test_route/NAServer/ClosestHydrant");
+         
+      locator = new esri.tasks.Locator("http://gis.ashevillenc.gov/COA_ArcGIS_Server/rest/services/Buncombe_Address_Point/GeocodeServer");
+      dojo.connect(locator, "onAddressToLocationsComplete", showResults);
                                                                 
     }
+	function solveClosest(task){
+	if (task=="Fire Station"){
 	
+	closestFacilityTask.solve(params,function(solveResult){
+        var directions = solveResult.directions;
 
+       dojo.forEach(solveResult.routes, function(route, index){
+         //build an array of route info
+          
+          var attr = dojo.map(solveResult.directions[index].features,function(feature){
+          
+         return feature.attributes.text;
+         });
+          var infoTemplate = new esri.InfoTemplate("Attributes", "${*}");
+          
+          route.setInfoTemplate(infoTemplate);
+          route.setAttributes(attr);
+          
+          routeGraphicLayer.add(route);
+          dojo.byId("directionsDiv").innerHTML = "Hover over the route to view directions";
+      });
+      
+        //display any messages
+        if(solveResult.messages.length > 0){
+          dojo.byId("directionsDiv").innerHTML = "<b>Error:</b> " + solveResult.messages[0];
+        }   
+      })};}
+      
+      
 	
     function clearGraphics() {
       //clear graphics
@@ -210,38 +235,15 @@
       });
 
       //solve 
-      closestFacilityTask.solve(params,function(solveResult){
-        var directions = solveResult.directions;
-      
-        dojo.forEach(solveResult.routes, function(route, index){
-          //build an array of route info
-          
-          var attr = dojo.map(solveResult.directions[index].features,function(feature){
-            
-            return feature.attributes.length.toPrecision(1);
-          });
-          var infoTemplate = new esri.InfoTemplate("Attributes", "${*}");
-          
-          route.setInfoTemplate(infoTemplate);
-          route.setAttributes(attr);
-          
-          routeGraphicLayer.add(route);
-          dojo.byId("directionsDiv").innerHTML = "Hover over the route to view directions";
-        });
-        
-        //display any messages
-        if(solveResult.messages.length > 0){
-          dojo.byId("directionsDiv").innerHTML = "<b>Error:</b> " + solveResult.messages[0];
-        }      
-      });
+     
 
         
         map.infoWindow.resize(200,125);
       }
 
       function locate() {
-	  clearGraphics();	
         map.graphics.clear();
+        clearGraphics();
         var address = {"Street":dojo.byId("address").value,"Zone":dojo.byId("zone").value};
         locator.outSpatialReference= new esri.SpatialReference({wkid: 4326});//map.spatialReference; //new esri.SpatialReference({wkid: 2264});
         var options = {
@@ -249,7 +251,6 @@
           outFields:["Loc_name"]
         }
         locator.addressToLocations(options);
-		
       }
 
       function showResults(candidates) {
@@ -259,18 +260,51 @@
 
         symbol.setStyle(esri.symbol.SimpleMarkerSymbol.STYLE_SQUARE);
         symbol.setColor(new dojo.Color([153,0,51,0.75]));
-alert("Please Click within the red square for the closest facility")
+
         var geom;
+
         
         dojo.every(candidates,function(candidate){
           console.log(candidate.score);
           if (candidate.score > 80) {
             console.log(candidate.location);
+            
+
+
+                  
             var attributes = { address: candidate.address, score:candidate.score, locatorName:candidate.attributes.Loc_name };   
             geom = candidate.location;
             var graphic = new esri.Graphic(geom, symbol, attributes, infoTemplate);
             //add a graphic to the map at the geocoded location
             map.graphics.add(graphic);
+
+       var inPoint = new esri.geometry.Point(geom.x,geom.y,map.spatialReference);
+       //alert(geom.x);
+      var location = new esri.Graphic(inPoint);
+      incidentsGraphicsLayer.add(location);
+      
+      var features = [];
+      features.push(location);
+      var incidents = new esri.tasks.FeatureSet();
+      incidents.features = features;
+      params.incidents = incidents;
+
+      dojo.connect(routeGraphicLayer,"onMouseOver", function(evt){
+        //clear existing directions and highlight symbol
+        map.graphics.clear();
+        
+        dojo.byId("directionsDiv").innerHTML= "Hover over the route to view directions";
+        
+        var highlightSymbol = new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new dojo.Color([0,255,255],0.25), 4.5);
+        var highlightGraphic = new esri.Graphic(evt.graphic.geometry,highlightSymbol);
+        
+        map.graphics.add(highlightGraphic);
+        dojo.byId("directionsDiv").innerHTML = esri.substitute(evt.graphic.attributes,"${*}");
+
+      });
+
+      
+                        
             //add a text symbol to the map listing the location of the matched address.
             var displayText = candidate.address;
             var font = new esri.symbol.Font("16pt",esri.symbol.Font.STYLE_NORMAL, esri.symbol.Font.VARIANT_NORMAL,esri.symbol.Font.WEIGHT_BOLD,"Helvetica");
@@ -342,6 +376,13 @@ alert("Please Click within the red square for the closest facility")
                         <button data-dojo-type="dijit.form.Button" onclick="locate()"> Locate</button>  
                         </div>
                         -->
+						<p>What are you looking for?</p>
+						<select name="numLocations" data-dojo-type="dijit.form.ComboBox" value="" onChange="solveClosest(this.value);" style="width:60px;">
+                          <option selected="selected">Fire Station</option>
+                          <option>Hydrant</option>
+                          
+                      </select> 
+						
                     <div id="map" class="roundedCorners shadow" data-dojo-type="dijit.layout.ContentPane" data-dojo-props="region:'center'">
                     </div>
 
