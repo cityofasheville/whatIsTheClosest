@@ -62,22 +62,17 @@
            dataType: 'json',
            jsonpCallback: 'MyJSONPCallback', // specify the callback name if you're hard-coding it
            jsonp : "callback",
-           success:function(data){alert('success');},
-           error:function(data){alert('failed');}
+           success:getResults(data),
+           error:function(data){console.log('ajax failed');}
        });
 
        
-        //$.getJSON(urlStr, function(result){
-        //    //retVal = result;
-        //    pt = getPoint(result);
-        //    UpdateResults(result);
-        //    return pt;
-        //});
-        
+       
    }
    
    
-       function MyJSONPCallback(result){
+       function getResults(result){
+            console.log('ajax success');
             pt = getPoint(result);
             UpdateResults(result);
             return pt;          
