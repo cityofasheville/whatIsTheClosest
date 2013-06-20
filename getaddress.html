@@ -64,7 +64,7 @@
            data: data,
            jsonpCallback: 'MyJSONPCallback', // specify the callback name if you're hard-coding it
            jsonp : "callback",
-           success:getResults(data),
+           success:getResults,
            error:function(data){console.log('ajax failed');}
        });
 
@@ -72,8 +72,7 @@
        
    }
    
-   
-       function getResults(result){
+   var getResults = function(data){
             console.log('ajax success');
             pt = getPoint(result);
             UpdateResults(result);
