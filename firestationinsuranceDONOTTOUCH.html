@@ -33,31 +33,53 @@
    <!--<script type="text/javascript" src="/jquery/jquery-1.3.2.min.js"></script> -->
    <script type="text/javascript" src="js/jquery.js"></script>
    <script type="text/javascript" language="javascript">
-    
+   
+
    function UpdateResults(jd,idStr){
          $('#results').append('<p>Entered Address: ' + jd.candidates[0].address + '');
         //$('#results').append('<p>Score : ' + jd.candidates[0].score+ '');
-        $('#results').append('<p>Location: ' + jd.candidates[0].location.x + ',' + jd.candidates[0].location.y + '');
+        // $('#results').append('<p>Location: ' + jd.candidates[0].location.x + ',' + jd.candidates[0].location.y + '');
    }
     
    function getPoint(jd){
       // var retval = jd.candidates[0].location.x + ',' + jd.candidates[0].location.y ;
    }
    
-   function getClosest(pos,type){
-         //getAddress();
-		
+   function getAddress(closestType){
+         $('#loading').css('visibility','visible')
        addressStr = $('#address').val();
        ZipStr = $('#zone').val();
-	   //type="closestFireStation"
-xStr=pos.geometries[0].x;
-yStr=pos.geometries[0].y;
-var urlStr = 'http://coa-gis-imagery/COA_Internal_ArcGIS/rest/services/Publish/test_route/NAServer/'+type+'/solveClosestFacility?incidents='+xStr+'%2C'+yStr+'&facilities=&barriers=&polylineBarriers=&polygonBarriers=&travelDirection=esriNATravelDirectionToFacility&defaultCutoff=&defaultTargetFacilityCount=1&outSR=2264&accumulateAttributeNames=Distance&impedanceAttributeName=Distance&restrictionAttributeNames=Use+One+Way&attributeParameterValues=&restrictUTurns=esriNFSBAllowBacktrack&useHierarchy=true&returnDirections=true&returnCFRoutes=true&returnFacilities=false&returnIncidents=false&returnBarriers=false&returnPolylineBarriers=false&returnPolygonBarriers=false&directionsLanguage=en-US&directionsStyleName=NA+Desktop&outputLines=esriNAOutputLineTrueShape&outputGeometryPrecision=&outputGeometryPrecisionUnits=esriUnknownUnits&directionsTimeAttributeName=Drive+Time&directionsLengthUnits=esriNAUMiles&f=pjson';
+       var urlStr = 'http://gis.ashevillenc.gov/COA_ArcGIS_Server/rest/services/Buncombe_Address_Point/GeocodeServer/findAddressCandidates?Street='+addressStr+'&Zone='+ZipStr+'&outFields=&f=pjson';
+       var pt = [];
+       var retVal;
+       
+      // $('#results').html('<p>Entered address : ' + addressStr + '</p>');
+       //$('#results').append('<p>Entered zip : ' + ZipStr + '</p>');
+       
+       $.ajax({
+           url: urlStr,
+           dataType: 'jsonp',
+           crossDomain: true,
+           jsonpCallback: 'MyJSONPCallback', // specify the callback name if you're hard-coding it
+           jsonp : "callback",
+           success:function(data){getResults(data,closestType);},
+           error:function(data){console.log('ajax failed');}
+       });
+}
+
+       function getClosest(jd,closestType){
+         //getAddress();
+       addressStr = $('#address').val();
+       ZipStr = $('#zone').val();
+	   xStr=jd.candidates[0].location.x;
+	   yStr=jd.candidates[0].location.y;
+	       var urlStr = 'http://coa-gis-imagery/COA_Internal_ArcGIS/rest/services/Publish/test_route/NAServer/'+closestType+'/solveClosestFacility?incidents='+xStr+'%2C'+yStr+'&facilities=&barriers=&polylineBarriers=&polygonBarriers=&travelDirection=esriNATravelDirectionToFacility&defaultCutoff=&defaultTargetFacilityCount=1&outSR=2264&accumulateAttributeNames=Distance&impedanceAttributeName=Distance&restrictionAttributeNames=Use+One+Way&attributeParameterValues=&restrictUTurns=esriNFSBAllowBacktrack&useHierarchy=true&returnDirections=true&returnCFRoutes=true&returnFacilities=false&returnIncidents=false&returnBarriers=false&returnPolylineBarriers=false&returnPolygonBarriers=false&directionsLanguage=en-US&directionsStyleName=NA+Desktop&outputLines=esriNAOutputLineTrueShape&outputGeometryPrecision=&outputGeometryPrecisionUnits=esriUnknownUnits&directionsTimeAttributeName=Drive+Time&directionsLengthUnits=esriNAUMiles&f=pjson';
+     //  var urlStr2 = 'http://coa-gis-imagery/COA_Internal_ArcGIS/rest/services/Publish/test_route/NAServer/ClosestHydrant/solveClosestFacility?incidents='+xStr+'%2C'+yStr+'&facilities=&barriers=&polylineBarriers=&polygonBarriers=&travelDirection=esriNATravelDirectionToFacility&defaultCutoff=&defaultTargetFacilityCount=1&outSR=2264&accumulateAttributeNames=Distance&impedanceAttributeName=Distance&restrictionAttributeNames=Use+One+Way&attributeParameterValues=&restrictUTurns=esriNFSBAllowBacktrack&useHierarchy=true&returnDirections=true&returnCFRoutes=true&returnFacilities=false&returnIncidents=false&returnBarriers=false&returnPolylineBarriers=false&returnPolygonBarriers=false&directionsLanguage=en-US&directionsStyleName=NA+Desktop&outputLines=esriNAOutputLineTrueShape&outputGeometryPrecision=&outputGeometryPrecisionUnits=esriUnknownUnits&directionsTimeAttributeName=Drive+Time&directionsLengthUnits=esriNAUMiles&f=pjson';
        var pt = '';
        var retVal;
        
       // $('#results').html('<p>Entered address : ' + addressStr + '</p>');
-     // $('#results').append('<p>Entered zip : ' + ZipStr + '</p>');
+     //  $('#results').append('<p>Entered zip : ' + ZipStr + '</p>');
        
        $.ajax({
            url: urlStr,
@@ -67,71 +89,33 @@ var urlStr = 'http://coa-gis-imagery/COA_Internal_ArcGIS/rest/services/Publish/t
            jsonp : "callback",
            success:dispResults,
            error:function(data){console.log('ajax failed1');$('#loading').css('visibility','hidden');}
-
+		   
        });
        
    }
-
    
-  
+    
+   
+   var getResults = function(data,closestType){
+            console.log('ajax success');
+            pt = getPoint(data);
+            UpdateResults(data);
+			getClosest(data,closestType);
+			return pt;
+			
+       }
    var dispResults = function(data){
             console.log('ajax success');
 			$('#loading').css('visibility','hidden');
-			$('#results').append('<p><b><font size=5>' + data.routes.features[0].attributes.Total_Distance.toPrecision(2) +'&nbsp' + 'miles to closest Fire Station at '+ data.routes.features[0].attributes.Name +'</font></p>'); 
-		  //
+			$('#results').append('<p><b>' + data.routes.features[0].attributes.Total_Distance.toPrecision(2) +'&nbsp' + 'miles to closest Fire Station at '+ data.routes.features[0].attributes.Name +'</p>'); 
+		
             //pt = getPoint(data);
             //UpdateResults(data);
 			//getClosest(data);
             //return pt;
 			
        }
-	   
-	   
-	  function initiate_geolocation(type) {  
-                
-				//var type = '';
-                navigator.geolocation.getCurrentPosition(function(pos){geo(pos,type);});  
-                
-            }  
-var geo = function(pos,type){  
-                
-	                  
-				  //getAddress();
-		 
-       addressStr = $('#address').val();
-       ZipStr = $('#zone').val();
-	   var lat= pos.coords.latitude;
-	   var lon= pos.coords.longitude;
-var urlStr2 ='http://gis.ashevillenc.gov/COA_ArcGIS_Server/rest/services/Geometry/GeometryServer/project?inSR=4326&outSR=2264&geometries='+lon+'%2C'+lat+'&f=pjson'
-       
-
-       $.ajax({
-           url: urlStr2,
-           dataType: 'jsonp',
-           crossDomain: true,
-           jsonpCallback: 'MyJSONPCallback', // specify the callback name if you're hard-coding it
-           jsonp : "callback",
-           success:function(data){getResults2(data,type);},
-           error:function(data){console.log('ajax failed1');$('#loading').css('visibility','hidden');}
-		   
-       });
-            }  
-	  var getResults = function(data,type){
-            console.log('ajax success');
-            pt = getPoint(data);
-            UpdateResults(data);
-			getClosest(data,type);
-			return pt;
-		}
-		var getResults2 = function(data,type){
-            console.log('ajax success');
-			//alert(data.geometries[0].x)
-            //pt = getPoint(data);
-            //UpdateResults(data);
-			getClosest(data,type);
-			//return pt;
-		}
-			
+	 
    </script>
   
   <style>
@@ -163,8 +147,9 @@ var urlStr2 ='http://gis.ashevillenc.gov/COA_ArcGIS_Server/rest/services/Geometr
           <div class="row-fluid">
             <div class="span9" >
               <h2>Search</h2>
-              
-                       <p> Enter an  address and the application will return the closest Fire Station or Hydrant. </p>
+              <p>Put search here</p>
+                       <p> Enter an input address and the application will use the sample address locator to return the location for
+                        street addresses in the United States. </p>
                         <br />Address:
                         <input type="text" class="span9" id="address" value="70 court pz" />
                         <br />Zip:
@@ -173,8 +158,8 @@ var urlStr2 ='http://gis.ashevillenc.gov/COA_ArcGIS_Server/rest/services/Geometr
 
               <div id="Div2"></div>
               <!-- data/address.json -->
-              <button type="submit" class="btn" id="Button1"  onclick="initiate_geolocation('closestFireStation')" >Closest Fire Station</button>
-			  <button type="submit" class="btn" id="Button2"  onclick="initiate_geolocation('closestHydrant')" >Closest Hydrant</button>
+              <button type="submit" class="btn" id="Button1" style="background-color:red" onclick="getAddress('ClosestFireStation')" >Closest Fire Station</button>
+			  <button type="submit" class="btn" id="Button1" style="background-color:blue" onclick="getAddress('ClosestHydrant')" >Closest Hydrant</button>
             </div><!--/span-->
            </div>
         </div>
@@ -187,7 +172,7 @@ var urlStr2 ='http://gis.ashevillenc.gov/COA_ArcGIS_Server/rest/services/Geometr
           <div class="row-fluid">
             <div class="span9" >
               <h2>Results</h2>
-              <div id="results" ></div><div id = "loading" style="visibility:hidden"><img src="img/loading.gif" width="105px" height="105px"/> Loading...</div>
+              <div id="results" ></div><div id = "loading" style="visibility:hidden"><img src="img/loading.gif" width="105" height="105"/> Loading...</div>
             </div><!--/span-->
            </div>
         </div>
