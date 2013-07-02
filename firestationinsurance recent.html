@@ -98,7 +98,7 @@
    
    var getResults = function(data,closestType,distance){
             console.log('ajax success');
-            pt = getPoint(data);
+            pt = getPoint(data); 
             UpdateResults(data);
 			getClosest(data,closestType,distance);
 			return pt;
@@ -111,6 +111,7 @@
 	switch(distance)
 {
 case 'success':
+
  $('#results').append('<p><b>' + data.routes.features[0].attributes.Total_Distance.toFixed(2) +'&nbsp' + 'miles to '+ data.routes.features[0].attributes.Name +'</p>');
   break;
 case 'feet':
@@ -121,11 +122,12 @@ default:
 }
             //pt = getPoint(data);   
             //UpdateResults(data);   
+
 			//getClosest(data);
             //return pt;
 			   
        }   
-	 
+	  
    </script>
   
   <style>
