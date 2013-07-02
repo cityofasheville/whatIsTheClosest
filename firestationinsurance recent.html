@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Fire Station Insurance COA</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Le styles -->
+    <link href="css/bootstrap.css" rel="stylesheet">
+    <style>
+      body {
+        padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
+      }
+    </style>
+    <link href="css/bootstrap-responsive.css" rel="stylesheet">
+
+  
+
+    <!-- Fav and touch icons -->
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="ico/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="ico/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="ico/apple-touch-icon-57-precomposed.png">
+    <link rel="shortcut icon" href="ico/favicon.png">
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.5/leaflet.css" />
+    <!--[if lte IE 8]>
+<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.5/leaflet.ie.css" />
+<![endif]-->
+     <script type="text/javascript" src="http://cdn.leafletjs.com/leaflet-0.5/leaflet.js"></script>
+    <!-- <style type="text/javascript">#map { height: 180px; }</style> -->
+   <!--<script type="text/javascript" src="/jquery/jquery-1.3.2.min.js"></script> -->
+   <script type="text/javascript" src="js/jquery.js"></script>
+   <script type="text/javascript" language="javascript">
+   
+
+   function UpdateResults(jd,idStr){
+         $('#results').append('<p>Entered Address: ' + jd.candidates[0].address + '');
+        //$('#results').append('<p>Score : ' + jd.candidates[0].score+ '');
+        // $('#results').append('<p>Location: ' + jd.candidates[0].location.x + ',' + jd.candidates[0].location.y + '');
+   }
+    
+   function getPoint(jd){
+      // var retval = jd.candidates[0].location.x + ',' + jd.candidates[0].location.y ;
+   }
+   
+   function getAddress(closestType,distance){
+         $('#loading').css('visibility','visible')
+       addressStr = $('#address').val();
+       ZipStr = $('#zone').val();
+       var urlStr = 'http://gis.ashevillenc.gov/COA_ArcGIS_Server/rest/services/Buncombe_Address_Point/GeocodeServer/findAddressCandidates?Street='+addressStr+'&Zone='+ZipStr+'&outFields=&f=pjson';
+       var pt = [];
+       var retVal;
+       
+      // $('#results').html('<p>Entered address : ' + addressStr + '</p>');
+       //$('#results').append('<p>Entered zip : ' + ZipStr + '</p>');
+     
+       $.ajax({
+           url: urlStr,
+           dataType: 'jsonp',
+           crossDomain: true,
+           jsonpCallback: 'MyJSONPCallback', // specify the callback name if you're hard-coding it
+           jsonp : "callback",
+           success:function(data){getResults(data,closestType,distance);},
+           error:function(data){console.log('ajax failed');}
+       });
+}
+
+       function getClosest(jd,closestType,distance){
+         //getAddress();
+       addressStr = $('#address').val();
+       ZipStr = $('#zone').val();
+	   xStr=jd.candidates[0].location.x;
+	   yStr=jd.candidates[0].location.y;
+	       var urlStr = 'http://coa-gis-imagery/COA_Internal_ArcGIS/rest/services/Publish/test_route/NAServer/'+closestType+'/solveClosestFacility?incidents='+xStr+'%2C'+yStr+'&facilities=&barriers=&polylineBarriers=&polygonBarriers=&travelDirection=esriNATravelDirectionToFacility&defaultCutoff=&defaultTargetFacilityCount=1&outSR=2264&accumulateAttributeNames=Distance&impedanceAttributeName=Distance&restrictionAttributeNames=Use+One+Way&attributeParameterValues=&restrictUTurns=esriNFSBAllowBacktrack&useHierarchy=true&returnDirections=true&returnCFRoutes=true&returnFacilities=false&returnIncidents=false&returnBarriers=false&returnPolylineBarriers=false&returnPolygonBarriers=false&directionsLanguage=en-US&directionsStyleName=NA+Desktop&outputLines=esriNAOutputLineTrueShape&outputGeometryPrecision=&outputGeometryPrecisionUnits=esriUnknownUnits&directionsTimeAttributeName=Drive+Time&directionsLengthUnits=esriNAUMiles&f=pjson';
+     //  var urlStr2 = 'http://coa-gis-imagery/COA_Internal_ArcGIS/rest/services/Publish/test_route/NAServer/ClosestHydrant/solveClosestFacility?incidents='+xStr+'%2C'+yStr+'&facilities=&barriers=&polylineBarriers=&polygonBarriers=&travelDirection=esriNATravelDirectionToFacility&defaultCutoff=&defaultTargetFacilityCount=1&outSR=2264&accumulateAttributeNames=Distance&impedanceAttributeName=Distance&restrictionAttributeNames=Use+One+Way&attributeParameterValues=&restrictUTurns=esriNFSBAllowBacktrack&useHierarchy=true&returnDirections=true&returnCFRoutes=true&returnFacilities=false&returnIncidents=false&returnBarriers=false&returnPolylineBarriers=false&returnPolygonBarriers=false&directionsLanguage=en-US&directionsStyleName=NA+Desktop&outputLines=esriNAOutputLineTrueShape&outputGeometryPrecision=&outputGeometryPrecisionUnits=esriUnknownUnits&directionsTimeAttributeName=Drive+Time&directionsLengthUnits=esriNAUMiles&f=pjson';
+       var pt = '';
+       var retVal;
+       
+      // $('#results').html('<p>Entered address : ' + addressStr + '</p>');
+     //  $('#results').append('<p>Entered zip : ' + ZipStr + '</p>');
+       
+       $.ajax({
+           url: urlStr,
+           dataType: 'jsonp',
+           crossDomain: true,
+           jsonpCallback: 'MyJSONPCallback', // specify the callback name if you're hard-coding it
+           jsonp : "callback",
+           success:function(data){dispResults(data,distance);},
+           error:function(data){console.log('ajax failed1');$('#loading').css('visibility','hidden');}
+		   
+       });
+       
+   }
+   
+    
+   
+   var getResults = function(data,closestType,distance){
+            console.log('ajax success');
+            pt = getPoint(data); 
+            UpdateResults(data);
+			getClosest(data,closestType,distance);
+			return pt;
+			
+       }
+   var dispResults = function(data,distance){
+            console.log('ajax success');
+			$('#loading').css('visibility','hidden');
+		
+	switch(distance)
+{
+case 'success':
+ $('#results').append('<p><b>' + data.routes.features[0].attributes.Total_Distance.toFixed(1) +'&nbsp' + 'miles to '+ data.routes.features[0].attributes.Name +'</p>');
+  break;
+case 'feet':
+  $('#results').append('<p><b>' + data.routes.features[0].attributes.Total_Distance.toFixed(1)*5280 +'&nbsp' + 'feet to '+ data.routes.features[0].attributes.Name +'</p>');
+  break;
+default:
+ $('#results').append('<p><b>' + data.routes.features[0].attributes.Total_Distance.toFixed(1) +'&nbsp' + 'miles to '+ data.routes.features[0].attributes.Name +'</p>');
+}
+            //pt = getPoint(data);
+            //UpdateResults(data);
+			//getClosest(data);
+            //return pt;
+			
+       }
+	 
+   </script>
+  
+  <style>
+    body,html,#main{margin:0;padding:0;height:100%;width:100%;}
+    .panel {
+    -moz-border-radius: 6px;
+    -webkit-border-radius: 6px;
+    -moz-box-shadow: 0px 6px 3px -3px #888;
+    -webkit-box-shadow: 0px 6px 3px -3px #888;
+    box-shadow: 0px 6px 3px -3px #888;
+    border: 2px solid #86942A;
+    margin: 5px;5px;5px;5px;
+  }
+  </style>
+  
+
+  
+  </head>
+
+  <body>
+
+    
+
+    <div class="container">
+
+      
+
+        <div class="span9">
+          <div class="row-fluid">
+            <div class="span9" >
+              <h2>Search</h2>
+              <p>Put search here</p>
+                       <p> Enter an input address and the application will use the sample address locator to return the location for
+                        street addresses in the United States. </p>
+                        <br />Address:
+                        <input type="text" class="span9" id="address" value="70 court pz" />
+                        <br />Zip:
+                        <input type="text" class="span2" id="zone" value="28801" />
+                        <br />
+
+              <div id="Div2"></div>
+              <!-- data/address.json -->
+              <button type="submit" class="btn" id="Button1"  onclick="getAddress('ClosestFireStation','miles')" >Closest Fire Station</button>
+			  <button type="submit" class="btn" id="Button1"  onclick="getAddress('ClosestHydrant','feet')" >Closest Hydrant</button>
+            </div><!--/span-->
+           </div>
+        </div>
+        
+  
+
+        
+  
+        <div class="span9">
+          <div class="row-fluid">
+            <div class="span9" >
+              <h2>Results</h2>
+              <div id="results" ></div><div id = "loading" style="visibility:hidden"><img src="img/loading.gif" width="105" height="105"/> Loading...</div>
+            </div><!--/span-->
+           </div>
+        </div>
+                 
+        <p><br/></p>
+ 
+
+    </div> 
+
+
+    <!-- Placed at the end of the document so the pages load faster -->
+
+    <script src="js/bootstrap-transition.js"></script>
+    <script src="js/bootstrap-alert.js"></script>
+    <script src="js/bootstrap-modal.js"></script>
+    <script src="js/bootstrap-dropdown.js"></script>
+    <script src="js/bootstrap-scrollspy.js"></script>
+    <script src="js/bootstrap-tab.js"></script>
+    <script src="js/bootstrap-tooltip.js"></script>
+    <script src="js/bootstrap-popover.js"></script>
+    <script src="js/bootstrap-button.js"></script>
+    <script src="js/bootstrap-collapse.js"></script>
+    <script src="js/bootstrap-carousel.js"></script>
+    <script src="js/bootstrap-typeahead.js"></script>
+     <script type="text/javascript" >
+
+
+
+     </script>
+  </body>
+</html>
