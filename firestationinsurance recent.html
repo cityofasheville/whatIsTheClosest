@@ -115,16 +115,16 @@ case 'success':
   break;
 case 'feet':
   $('#results').append('<p><b>' + data.routes.features[0].attributes.Total_Distance.toFixed(3)*5280 +'&nbsp' + 'feet to '+ data.routes.features[0].attributes.Name +'</p>');
-  break;
+  break;   
 default:  
  $('#results').append('<p><b>' + data.routes.features[0].attributes.Total_Distance.toFixed(2) +'&nbsp' + 'miles to '+ data.routes.features[0].attributes.Name +'</p>');
 }
             //pt = getPoint(data);   
-            //UpdateResults(data);
+            //UpdateResults(data);   
 			//getClosest(data);
             //return pt;
-			
-       }
+			   
+       }   
 	 
    </script>
   
