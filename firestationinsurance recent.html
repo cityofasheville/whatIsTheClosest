@@ -111,21 +111,23 @@
 	switch(distance)
 {
 case 'success':
- $('#results').append('<p><b>' + data.routes.features[0].attributes.Total_Distance.toFixed(1) +'&nbsp' + 'miles to '+ data.routes.features[0].attributes.Name +'</p>');
+
+ $('#results').append('<p><b>' + data.routes.features[0].attributes.Total_Distance.toFixed(2) +'&nbsp' + 'miles to '+ data.routes.features[0].attributes.Name +'</p>');
   break;
 case 'feet':
-  $('#results').append('<p><b>' + data.routes.features[0].attributes.Total_Distance.toFixed(1)*5280 +'&nbsp' + 'feet to '+ data.routes.features[0].attributes.Name +'</p>');
-  break;
-default:
- $('#results').append('<p><b>' + data.routes.features[0].attributes.Total_Distance.toFixed(1) +'&nbsp' + 'miles to '+ data.routes.features[0].attributes.Name +'</p>');
+  $('#results').append('<p><b>' + data.routes.features[0].attributes.Total_Distance.toFixed(3)*5280 +'&nbsp' + 'feet to '+ data.routes.features[0].attributes.Name +'</p>');
+  break;   
+default:  
+ $('#results').append('<p><b>' + data.routes.features[0].attributes.Total_Distance.toFixed(2) +'&nbsp' + 'miles to '+ data.routes.features[0].attributes.Name +'</p>');
 }
-            //pt = getPoint(data);
-            //UpdateResults(data);
+            //pt = getPoint(data);   
+            //UpdateResults(data);   
+
 			//getClosest(data);
             //return pt;
-			
-       }
-	 
+			   
+       }   
+	  
    </script>
   
   <style>
