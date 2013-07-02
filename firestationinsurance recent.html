@@ -45,7 +45,7 @@
       // var retval = jd.candidates[0].location.x + ',' + jd.candidates[0].location.y ;
    }
    
-   function getAddress(closestType){
+   function getAddress(closestType,distance){
          $('#loading').css('visibility','visible')
        addressStr = $('#address').val();
        ZipStr = $('#zone').val();
@@ -55,19 +55,19 @@
        
       // $('#results').html('<p>Entered address : ' + addressStr + '</p>');
        //$('#results').append('<p>Entered zip : ' + ZipStr + '</p>');
-       
+     
        $.ajax({
            url: urlStr,
            dataType: 'jsonp',
            crossDomain: true,
            jsonpCallback: 'MyJSONPCallback', // specify the callback name if you're hard-coding it
            jsonp : "callback",
-           success:function(data){getResults(data,closestType);},
+           success:function(data){getResults(data,closestType,distance);},
            error:function(data){console.log('ajax failed');}
        });
 }
 
-       function getClosest(jd,closestType){
+       function getClosest(jd,closestType,distance){
          //getAddress();
        addressStr = $('#address').val();
        ZipStr = $('#zone').val();
@@ -87,7 +87,7 @@
            crossDomain: true,
            jsonpCallback: 'MyJSONPCallback', // specify the callback name if you're hard-coding it
            jsonp : "callback",
-           success:dispResults,
+           success:function(data){dispResults(data,distance);},
            error:function(data){console.log('ajax failed1');$('#loading').css('visibility','hidden');}
 		   
        });
@@ -96,19 +96,29 @@
    
     
    
-   var getResults = function(data,closestType){
+   var getResults = function(data,closestType,distance){
             console.log('ajax success');
             pt = getPoint(data);
             UpdateResults(data);
-			getClosest(data,closestType);
+			getClosest(data,closestType,distance);
 			return pt;
 			
        }
-   var dispResults = function(data){
+   var dispResults = function(data,distance){
             console.log('ajax success');
 			$('#loading').css('visibility','hidden');
-			$('#results').append('<p><b>' + data.routes.features[0].attributes.Total_Distance.toPrecision(2) +'&nbsp' + 'miles to '+ data.routes.features[0].attributes.Name +'</p>'); 
 		
+	switch(distance)
+{
+case 'success':
+ $('#results').append('<p><b>' + data.routes.features[0].attributes.Total_Distance.toFixed(2) +'&nbsp' + 'miles to '+ data.routes.features[0].attributes.Name +'</p>');
+  break;
+case 'feet':
+  $('#results').append('<p><b>' + data.routes.features[0].attributes.Total_Distance.toFixed(3)*5280 +'&nbsp' + 'feet to '+ data.routes.features[0].attributes.Name +'</p>');
+  break;
+default:
+ $('#results').append('<p><b>' + data.routes.features[0].attributes.Total_Distance.toFixed(2) +'&nbsp' + 'miles to '+ data.routes.features[0].attributes.Name +'</p>');
+}
             //pt = getPoint(data);
             //UpdateResults(data);
 			//getClosest(data);
@@ -158,8 +168,8 @@
 
               <div id="Div2"></div>
               <!-- data/address.json -->
-              <button type="submit" class="btn" id="Button1"  onclick="getAddress('ClosestFireStation')" >Closest Fire Station</button>
-			  <button type="submit" class="btn" id="Button1"  onclick="getAddress('ClosestHydrant')" >Closest Hydrant</button>
+              <button type="submit" class="btn" id="Button1"  onclick="getAddress('ClosestFireStation','miles')" >Closest Fire Station</button>
+			  <button type="submit" class="btn" id="Button1"  onclick="getAddress('ClosestHydrant','feet')" >Closest Hydrant</button>
             </div><!--/span-->
            </div>
         </div>
