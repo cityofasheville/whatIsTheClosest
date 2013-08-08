@@ -46,16 +46,14 @@
    }
    
    function getAddress(closestType,distance){
-         $('#loading').css('visibility','visible')
+       $('#loading').css('visibility','visible')
+       $('#results').html('');
        addressStr = $('#address').val();
        ZipStr = $('#zone').val();
        var urlStr = 'http://gis.ashevillenc.gov/COA_ArcGIS_Server/rest/services/Buncombe_Address_Point/GeocodeServer/findAddressCandidates?Street='+addressStr+'&Zone='+ZipStr+'&outFields=&f=pjson';
        var pt = [];
        var retVal;
        
-      // $('#results').html('<p>Entered address : ' + addressStr + '</p>');
-       //$('#results').append('<p>Entered zip : ' + ZipStr + '</p>');
-     
        $.ajax({
            url: urlStr,
            dataType: 'jsonp',
@@ -67,20 +65,56 @@
        });
 }
 
-       function getClosest(jd,closestType,distance){
-         //getAddress();
+    function makeFacilityEnvelope(jd,distance){
+	   xStr=jd.candidates[0].location.x;
+	   yStr=jd.candidates[0].location.y;
+	   
+	   maxX=parseFloat(xStr)+parseFloat(distance);
+	   maxY=parseFloat(yStr)+parseFloat(distance);
+
+	   minX=parseFloat(xStr)-parseFloat(distance);
+	   minY=parseFloat(yStr)-parseFloat(distance);
+	   
+	   retVal=maxX+','+maxY+','+minX+','+minY;
+	   
+	   return retVal;
+	   
+	   
+    }//makeFacilityEnvelope
+    
+    function getFacilities(jd,closestType,distance){
+        facEnv=makeFacilityEnvelope(jd,500);
+        
+        var urlStr='http://coa-gis-imagery/COA_Internal_ArcGIS/rest/services/Publish/test_route/MapServer/0/query?text=&geometry='+facEnv+'&geometryType=esriGeometryEnvelope&inSR=2264&spatialRel=esriSpatialRelEnvelopeIntersects&relationParam=&objectIds=&where=&time=&returnIdsOnly=false&returnGeometry=true&maxAllowableOffset=&outSR=2264&outFields=objectid%2C&f=pjson'
+
+         $.ajax({
+                   url: urlStr,
+                   dataType: 'jsonp',
+                   crossDomain: true,
+                   jsonpCallback: 'MyJSONPCallback', // specify the callback name if you're hard-coding it
+                   jsonp : "callback",
+                   success:function(data){makeFacilityList(data,jd,closestType,distance);},
+                   error:function(data){console.log('ajax failed1');$('#loading').css('visibility','hidden');}
+        		   
+               });        
+        
+        return urlStr;
+    }//getFacilities
+    
+    function getClosest(jd,fac,closestType,distance){
+         
        addressStr = $('#address').val();
        ZipStr = $('#zone').val();
 	   xStr=jd.candidates[0].location.x;
 	   yStr=jd.candidates[0].location.y;
-	       var urlStr = 'http://coa-gis-imagery/COA_Internal_ArcGIS/rest/services/Publish/test_route/NAServer/'+closestType+'/solveClosestFacility?incidents='+xStr+'%2C'+yStr+'&facilities=&barriers=&polylineBarriers=&polygonBarriers=&travelDirection=esriNATravelDirectionToFacility&defaultCutoff=&defaultTargetFacilityCount=1&outSR=2264&accumulateAttributeNames=Distance&impedanceAttributeName=Distance&restrictionAttributeNames=Use+One+Way&attributeParameterValues=&restrictUTurns=esriNFSBAllowBacktrack&useHierarchy=true&returnDirections=true&returnCFRoutes=true&returnFacilities=false&returnIncidents=false&returnBarriers=false&returnPolylineBarriers=false&returnPolygonBarriers=false&directionsLanguage=en-US&directionsStyleName=NA+Desktop&outputLines=esriNAOutputLineTrueShape&outputGeometryPrecision=&outputGeometryPrecisionUnits=esriUnknownUnits&directionsTimeAttributeName=Drive+Time&directionsLengthUnits=esriNAUMiles&f=pjson';
-     //  var urlStr2 = 'http://coa-gis-imagery/COA_Internal_ArcGIS/rest/services/Publish/test_route/NAServer/ClosestHydrant/solveClosestFacility?incidents='+xStr+'%2C'+yStr+'&facilities=&barriers=&polylineBarriers=&polygonBarriers=&travelDirection=esriNATravelDirectionToFacility&defaultCutoff=&defaultTargetFacilityCount=1&outSR=2264&accumulateAttributeNames=Distance&impedanceAttributeName=Distance&restrictionAttributeNames=Use+One+Way&attributeParameterValues=&restrictUTurns=esriNFSBAllowBacktrack&useHierarchy=true&returnDirections=true&returnCFRoutes=true&returnFacilities=false&returnIncidents=false&returnBarriers=false&returnPolylineBarriers=false&returnPolygonBarriers=false&directionsLanguage=en-US&directionsStyleName=NA+Desktop&outputLines=esriNAOutputLineTrueShape&outputGeometryPrecision=&outputGeometryPrecisionUnits=esriUnknownUnits&directionsTimeAttributeName=Drive+Time&directionsLengthUnits=esriNAUMiles&f=pjson';
+	   
+	   console.log(facEnv); 
+	   
+	   var urlStr = 'http://coa-gis-imagery/COA_Internal_ArcGIS/rest/services/Publish/test_route/NAServer/'+closestType+'/solveClosestFacility?incidents='+xStr+'%2C'+yStr+'&facilities='+fac+'&barriers=&polylineBarriers=&polygonBarriers=&travelDirection=esriNATravelDirectionToFacility&defaultCutoff=&defaultTargetFacilityCount=1&outSR=2264&accumulateAttributeNames=Distance&impedanceAttributeName=Distance&restrictionAttributeNames=Use+One+Way&attributeParameterValues=&restrictUTurns=esriNFSBAllowBacktrack&useHierarchy=true&returnDirections=true&returnCFRoutes=true&returnFacilities=false&returnIncidents=false&returnBarriers=false&returnPolylineBarriers=false&returnPolygonBarriers=false&directionsLanguage=en-US&directionsStyleName=NA+Desktop&outputLines=esriNAOutputLineTrueShape&outputGeometryPrecision=&outputGeometryPrecisionUnits=esriUnknownUnits&directionsTimeAttributeName=Drive+Time&directionsLengthUnits=esriNAUMiles&f=pjson';
        var pt = '';
        var retVal;
        
-      // $('#results').html('<p>Entered address : ' + addressStr + '</p>');
-     //  $('#results').append('<p>Entered zip : ' + ZipStr + '</p>');
-       
+      
        $.ajax({
            url: urlStr,
            dataType: 'jsonp',
@@ -92,41 +126,50 @@
 		   
        });
        
-   }
+   }//getClosest
    
     
    
    var getResults = function(data,closestType,distance){
-            console.log('ajax success');
-            pt = getPoint(data); 
-            UpdateResults(data);
-			getClosest(data,closestType,distance);
-			return pt;
-			
+        console.log('ajax success');
+        pt = getPoint(data); 
+        UpdateResults(data);
+        getFacilities(data,closestType,distance)
+        return pt;
+    }//getResults
+       
+    var makeFacilityList = function(data,jd,closestType,distance){
+        console.log('ajax success');
+        //console.log(data.geometry.count);
+        console.log(data);
+        console.log(data.features.length);
+        theFacs='';
+        for(var i=0;i< data.features.length;i++){
+            theFacs+=data.features[i].geometry.x+','+data.features[i].geometry.y+';';
        }
-   var dispResults = function(data,distance){
-            console.log('ajax success');
-			$('#loading').css('visibility','hidden');
-		
-	switch(distance)
-{
-case 'success':
-
- $('#results').append('<p><b>' + data.routes.features[0].attributes.Total_Distance.toFixed(2) +'&nbsp' + 'miles to '+ data.routes.features[0].attributes.Name +'</p>');
-  break;
-case 'feet':
-  $('#results').append('<p><b>' + data.routes.features[0].attributes.Total_Distance.toFixed(3)*5280 +'&nbsp' + 'feet to '+ data.routes.features[0].attributes.Name +'</p>');
-  break;   
-default:  
- $('#results').append('<p><b>' + data.routes.features[0].attributes.Total_Distance.toFixed(2) +'&nbsp' + 'miles to '+ data.routes.features[0].attributes.Name +'</p>');
-}
-            //pt = getPoint(data);   
-            //UpdateResults(data);   
-
-			//getClosest(data);
-            //return pt;
-			   
-       }   
+        
+        theFacs=theFacs.substring(0, theFacs.length-1);
+        console.log(theFacs);
+        getClosest(jd,theFacs,closestType,distance);
+        
+    }//makeFacilityList
+    var dispResults = function(data,distance){
+        console.log('ajax success');
+        $('#loading').css('visibility','hidden');
+         
+        switch(distance)
+            {
+            case 'success':
+             $('#results').append('test');
+             $('#results').append('<p><b>' + data.routes.features[0].attributes.Total_Distance.toFixed(2) +'&nbsp' + 'miles to '+ data.routes.features[0].attributes.Name +'</p>');
+              break;
+            case 'feet':
+              $('#results').append('<p><b>' + data.routes.features[0].attributes.Total_Distance.toFixed(3)*5280 +'&nbsp' + 'feet to '+ data.routes.features[0].attributes.Name +'</p>');
+              break;   
+            default:  
+             $('#results').append('<p><b>' + data.routes.features[0].attributes.Total_Distance.toFixed(2) +'&nbsp' + 'miles to '+ data.routes.features[0].attributes.Name +'</p>');
+            }//switch
+    }   
 	  
    </script>
   
@@ -170,8 +213,8 @@ default:
 
               <div id="Div2"></div>
               <!-- data/address.json -->
-              <button type="submit" class="btn" id="Button1"  onclick="getAddress('ClosestFireStation','miles')" >Closest Fire Station</button>
-			  <button type="submit" class="btn" id="Button1"  onclick="getAddress('ClosestHydrant','feet')" >Closest Hydrant</button>
+              <button type="submit" class="btn" id="BtnFire"  onclick="getAddress('ClosestFireStation','miles')" >Closest Fire Station</button>
+			  <button type="submit" class="btn" id="BtnHyd"  onclick="getAddress('ClosestHydrant','feet')" >Closest Hydrant</button>
             </div><!--/span-->
            </div>
         </div>
@@ -184,7 +227,7 @@ default:
           <div class="row-fluid">
             <div class="span9" >
               <h2>Results</h2>
-              <div id="results" ></div><div id = "loading" style="visibility:hidden"><img src="img/loading.gif" width="105" height="105"/> Loading...</div>
+              <div id="results" ></div><div id = "loading" style="visibility:hidden"><img src="img/loading.gif" width="105" height="105"/> Seaching...</div>
             </div><!--/span-->
            </div>
         </div>
