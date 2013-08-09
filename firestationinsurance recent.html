@@ -29,7 +29,7 @@
     <!--[if lte IE 8]>
      <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.ie.css" />
     <![endif]-->    <!-- <style type="text/javascript">#map { height: 180px; }</style> -->
-    <!--<script type="text/javascript" src="/jquery/jquery-1.3.2.min.js"></script> -->
+
     <script type="text/javascript" src="js/jquery.js"></script>
     <script type="text/javascript" language="javascript">
 
@@ -44,9 +44,7 @@
        
        var urlStr = 'http://coa-gis-imagery/COA_Internal_ArcGIS/rest/services/Geometry/GeometryServer/'+
                     'project?inSR=2264&outSR=4326&geometries='+xStr+'%2C'+yStr+'6&f=pjson';
-                     
-      console.log(urlStr)
-       
+                            
        $.ajax({
            url: urlStr,
            dataType: 'jsonp',
@@ -62,7 +60,7 @@
    var zoomMap = function(data){
 	   xStr=data.geometries[0].x;
 	   yStr=data.geometries[0].y;
-	   console.log(data);
+	   //console.log(data);
 	   map.setView(new L.LatLng(yStr, xStr), 15);
 	   return '';
 	   
@@ -108,6 +106,11 @@
        myLines += ']}]'
        myJsonObject=JSON.parse(myLines);
        
+       var startPt = '[{"type": "Point","coordinates":['+data.routes.features[0].geometry.paths[0][0]+']}]';
+       drawPoints(startPt,'test');
+       var endPt = '[{"type": "Point","coordinates":['+data.routes.features[0].geometry.paths[0][(data.routes.features[0].geometry.paths[0].length-1)]+']}]'
+       drawPoints(endPt,'test');
+       
        var myStyle = {
            "color": "#ff7800",
            "weight": 10,
@@ -117,10 +120,37 @@
        geoJSONLayer = L.geoJson(myJsonObject, {
            style: myStyle
        });
-      
-       geoJSONLayer.addTo(map)
+       
+       var bounds = geoJSONLayer.getBounds();
+       geoJSONLayer.addTo(map);
+       map.fitBounds(bounds,100);
+       map.zoomOut(1);    
     }
-
+    
+    function drawPoints(GJfeat,type){
+        GJfeatObject=JSON.parse(GJfeat);
+        var geojsonMarkerOptions = {
+            radius: 8,
+            fillColor: "#ff7800",
+            color: "#000",
+            weight: 1,
+            opacity: 1,
+            fillOpacity: 0.8
+            
+        };
+        
+        var gjPT = L.geoJson(GJfeatObject, {
+            pointToLayer: function (feature, latlng) {
+                return L.circleMarker(latlng, geojsonMarkerOptions);
+            }
+        });
+        
+       
+       //geoJSONLayer = L.geoJson(circleMarker);
+       gjPT.addTo(map);
+           
+    }
+    
     function clearMap() {
         for(i in map._layers) {
             if(map._layers[i]._path != undefined) {
@@ -128,7 +158,7 @@
                     map.removeLayer(map._layers[i]);
                 }
                 catch(e) {
-                    console.log("problem with " + e + map._layers[i]);
+                    //console.log("problem with " + e + map._layers[i]);
                 }
             }
         }
@@ -198,7 +228,7 @@
 	   xStr=jd.candidates[0].location.x;
 	   yStr=jd.candidates[0].location.y;
 	   
-	   console.log(facEnv); 
+	   //console.log(facEnv); 
 
 	   
 	   var urlStr = 'http://coa-gis-imagery/COA_Internal_ArcGIS/rest/services/Publish/test_route/NAServer/'+closestType+
@@ -233,20 +263,17 @@
         console.log('ajax success');
         UpdateResults(data);
         getFacilities(data,closestType,distance)
-        getLatLong(data);
+        //getLatLong(data);
         return data;
         
     }//getResults
        
     var makeFacilityList = function(data,jd,closestType,distance){
-        console.log('ajax success');
-        console.log(data);
-        console.log(data.features.length);
+        //console.log('ajax success');
+        //console.log(data);
+        //console.log(data.features.length);
 
-
-            
         theFacs='{"features":[';
-        
 
         for(var i=0;i< data.features.length;i++){
            switch(closestType)
@@ -265,7 +292,7 @@
        }
         theFacs=theFacs.substring(0, theFacs.length-1); 
         theFacs=theFacs+']}';
-        console.log(theFacs);
+        //console.log(theFacs);
         getClosest(jd,theFacs,closestType,distance);
         
     }//makeFacilityList
@@ -288,7 +315,10 @@
             
             drawRoute(data)
     }   
-	 
+	function onEachFeature() {
+		var popupContent = "<p>test!</p>";
+	    layer.bindPopup(popupContent);
+	}	 
    </script>
   
   <style type="text/css">
@@ -303,7 +333,7 @@
     margin: 5px 5px 5px 5px;
   }
   #map { height: 400px;
-         width:  400px;
+         width:  600px;
         }
   </style>
   
@@ -322,7 +352,7 @@
         <div class="span9">
           <div class="row-fluid">
             <div class="span9" >
-              <h2>STEP 1</h2>
+              <h3>STEP 1</h3>
                        <p><b>Enter a street address.</b></p>
                         <div>
                             Address:&nbsp;<input type="text" class="span9" id="address" value="70 court pz" />
@@ -345,7 +375,7 @@
         <div class="span9">
           <div class="row-fluid">
             <div class="span9" >
-               <h2>STEP 2</h2>
+               <h3>STEP 2</h3>
                <p><b>Click to find the closest.</b></p>
               <button type="submit" class="btn" id="Button1"  onclick="getAddress('ClosestFireStation','miles')" >Fire Station</button>
 			  <button type="submit" class="btn" id="Button2"  onclick="getAddress('ClosestHydrant','feet')" >Fire Hydrant</button>
@@ -364,9 +394,9 @@
         <div class="span9">
           <div class="row-fluid">
             <div class="span9" >
-              <h2>STEP 3</h2>
-              <p><b>Get Results.</b></p>
-              <div id="results" ></div><div id = "loading" style="visibility:hidden"><img src="img/loading.gif" width="105" height="105"/> Seaching...</div>
+              <h3>STEP 3</h3>
+              <p><b>See the results.</b></p>
+              <div id="results" ><p>&nbsp;</br></br></p></div><div id = "loading" style="visibility:hidden"><img src="img/loading.gif" width="105" height="105"/> Seaching...</div>
             </div><!--/span-->
            </div>
         </div>
@@ -382,7 +412,7 @@
         <div class="span9">
           <div class="row-fluid">
             <div class="span9" >
-              <h2>STEP 4</h2>
+              <h3>STEP 4</h3>
               <p><b>View the map.</b></p>
               <div id="map" ></div>
             </div><!--/span-->
@@ -402,11 +432,6 @@
 
     <!-- Placed at the end of the document so the pages load faster -->
     <script type="text/javascript">
-  		//OSM_URL = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-		//OSM_ATTRIB = '&copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors';
-
-        //var map = L.map('map').setView([35.593,-82.5488], 13);
-        //L.tileLayer(OSM_URL, {attribution: OSM_ATTRIB, styleId: 997}).addTo(map);
         var map = L.map('map').setView([35.593,-82.5488], 13);
 
 		L.tileLayer('http://{s}.tile.cloudmade.com/{key}/22677/256/{z}/{x}/{y}.png', {
