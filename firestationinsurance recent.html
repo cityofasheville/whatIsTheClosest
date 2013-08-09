@@ -69,8 +69,9 @@
    }
    
    function getAddress(closestType,distance){
-       $('#loading').css('visibility','visible')
+       clearMap();
        $('#results').html('');
+       $('#loading').css('visibility','visible')
        addressStr = $('#address').val();
        ZipStr = $('#zone').val();
        var urlStr = 'http://gis.ashevillenc.gov/COA_ArcGIS_Server/rest/services/Buncombe_Address_Point/GeocodeServer/findAddressCandidates?Street='+addressStr+
@@ -91,7 +92,8 @@
    
 
     function drawRoute(data){
-    
+       var geojsonGroup = new L.LayerGroup();
+       
        var path=data.routes.features[0].geometry.paths[0]
        var myLines = '[{"type": "LineString","coordinates":['
        for(var i=0;i< data.routes.features[0].geometry.paths.length;i++)
@@ -106,20 +108,32 @@
        myLines += ']}]'
        myJsonObject=JSON.parse(myLines);
        
-       console.log(myJsonObject)
-
        var myStyle = {
            "color": "#ff7800",
            "weight": 10,
            "opacity": 0.65
        };
 
-       L.geoJson(myJsonObject, {
+       geoJSONLayer = L.geoJson(myJsonObject, {
            style: myStyle
-       }).addTo(map);
-    
+       });
+      
+       geoJSONLayer.addTo(map)
     }
-    
+
+    function clearMap() {
+        for(i in map._layers) {
+            if(map._layers[i]._path != undefined) {
+                try {
+                    map.removeLayer(map._layers[i]);
+                }
+                catch(e) {
+                    console.log("problem with " + e + map._layers[i]);
+                }
+            }
+        }
+    }
+        
     function makeFacilityEnvelope(jd,distance){
 	   xStr=jd.candidates[0].location.x;
 	   yStr=jd.candidates[0].location.y;
