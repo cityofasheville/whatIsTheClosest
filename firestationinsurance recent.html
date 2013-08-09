@@ -35,7 +35,7 @@
 
 
    function UpdateResults(jd,idStr){
-         $('#results').append('<p>Entered Address: ' + jd.candidates[0].address + '');
+         $('#results').append('The address&nbsp;' + jd.candidates[0].address + '');
    }
     
    function getLatLong(jd){
@@ -60,7 +60,7 @@
    var zoomMap = function(data){
 	   xStr=data.geometries[0].x;
 	   yStr=data.geometries[0].y;
-	   //console.log(data);
+
 	   map.setView(new L.LatLng(yStr, xStr), 15);
 	   return '';
 	   
@@ -72,9 +72,7 @@
        $('#loading').css('visibility','visible')
        addressStr = $('#address').val();
        ZipStr = $('#zone').val();
-       //var urlStr = 'http://gis.ashevillenc.gov/COA_ArcGIS_Server/rest/services/Buncombe_Address_Point/GeocodeServer/findAddressCandidates?Street='+addressStr+
-       //             '&Zone='+ZipStr+'&outFields=&f=pjson';
-        var urlStr =  'http://gis.ashevillenc.gov/COA_ArcGIS_Server/rest/services/'+
+       var urlStr =  'http://gis.ashevillenc.gov/COA_ArcGIS_Server/rest/services/'+
                       'Buncombe_Streets_With_Zip/GeocodeServer/'+
                       'findAddressCandidates?Street='+addressStr+
                       '&Zone='+ZipStr+'&outFields=&f=pjson';
@@ -98,7 +96,6 @@
        var myLines = '[{"type": "LineString","coordinates":['
        for(var i=0;i< data.routes.features[0].geometry.paths.length;i++)
        {
-            //console.log(data.routes.features[0].geometry.paths[i].length);
             for(var j=0;j< data.routes.features[0].geometry.paths[i].length;j++){
                 myLines += '['+data.routes.features[0].geometry.paths[i][j]+'],'
             }
@@ -128,7 +125,7 @@
        map.fitBounds(bounds,100);
        map.zoomOut(1);    
     }
-    //0B610B
+    
     function getColor(type){
         switch (type) {
             case 'start':
@@ -140,6 +137,8 @@
                 break;
         }   
     }
+    
+    
     function drawPoints(GJfeat,type){
         GJfeatObject=JSON.parse(GJfeat);
         var geojsonMarkerOptions = {
@@ -157,9 +156,7 @@
                 return L.circleMarker(latlng, geojsonMarkerOptions);
             }
         });
-        
-       
-       //geoJSONLayer = L.geoJson(circleMarker);
+
        gjPT.addTo(map);
            
     }
@@ -263,7 +260,7 @@
            crossDomain: true,
            jsonpCallback: 'MyJSONPCallback', // specify the callback name if you're hard-coding it
            jsonp : "callback",
-           success:function(data){dispResults(data,distance);},
+           success:function(data){dispResults(data,distance,closestType);},
            error:function(data){console.log('ajax failed1');$('#loading').css('visibility','hidden');}
 		   
        });
@@ -282,10 +279,6 @@
     }//getResults
        
     var makeFacilityList = function(data,jd,closestType,distance){
-        //console.log('ajax success');
-        //console.log(data);
-        //console.log(data.features.length);
-
         theFacs='{"features":[';
 
         for(var i=0;i< data.features.length;i++){
@@ -309,24 +302,45 @@
         getClosest(jd,theFacs,closestType,distance);
         
     }//makeFacilityList
-    var dispResults = function(data,distance){
-        console.log('ajax success');
+    var dispResults = function(data,distance,closestType){
+        console.log(distance);
         $('#loading').css('visibility','hidden');
-         
-        switch(distance)
-            {
-            case 'success':
-             $('#results').append('test');
-             $('#results').append('<p><b>' + data.routes.features[0].attributes.Total_Distance.toFixed(2) +'&nbsp' + 'miles to '+ data.routes.features[0].attributes.Name +'</p>');
-              break;
+        
+        switch(distance){
             case 'feet':
-              $('#results').append('<p><b>' + data.routes.features[0].attributes.Total_Distance.toFixed(3)*5280 +'&nbsp' + 'feet to '+ data.routes.features[0].attributes.Name +'</p>');
-              break;   
-            default:  
-             $('#results').append('<p><b>' + data.routes.features[0].attributes.Total_Distance.toFixed(2) +'&nbsp' + 'miles to '+ data.routes.features[0].attributes.Name +'</p>');
-            }//switch
-            
-            drawRoute(data)
+                distTemp = parseFloat( data.routes.features[0].attributes.Total_Distance.toFixed(2) ).toFixed(2);
+                dist = parseFloat(distTemp*5280).toFixed(2)
+                distMsg = 'Feet';
+                break;
+            case 'miles':
+                dist = parseFloat( data.routes.features[0].attributes.Total_Distance.toFixed(2) ).toFixed(2);
+                distMsg = 'Miles';
+                break;
+            default:
+                dist = parseFloat( data.routes.features[0].attributes.Total_Distance.toFixed(2) ).toFixed(2);
+                distMsg = 'Miles';
+                break;
+        }
+        switch(closestType){
+            case 'ClosestFireStation':
+                typeMsg = 'Fire Station';
+                break;
+            case 'ClosestHydrant':
+                typeMsg = 'Fire Hydrant';
+                break;
+            default:
+                typeMsg = 'Fire Station';
+                break;
+        };
+        
+        clMsg='<br/>&nbsp;&nbsp;&nbsp;<b>Is Closest to</b><br/>'
+        destMsg = data.routes.features[0].attributes.Name.replace('Location 1 - ','');
+        
+        $('#results').append(clMsg);
+        $('#results').append(typeMsg+' '+destMsg+'&nbsp;('+dist+'&nbsp;'+distMsg+')');
+        
+           
+        drawRoute(data)
     }   
 	function onEachFeature() {
 		var popupContent = "<p>test!</p>";
