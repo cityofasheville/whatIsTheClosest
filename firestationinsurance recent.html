@@ -37,13 +37,11 @@
 
    function UpdateResults(jd,idStr){
          $('#results').append('<p>Entered Address: ' + jd.candidates[0].address + '');
-        //$('#results').append('<p>Score : ' + jd.candidates[0].score+ '');
-        // $('#results').append('<p>Location: ' + jd.candidates[0].location.x + ',' + jd.candidates[0].location.y + '');
    }
     
-   function getPoint(jd){
+   //function getPoint(jd){
       // var retval = jd.candidates[0].location.x + ',' + jd.candidates[0].location.y ;
-   }
+   //}
    
    function getAddress(closestType,distance){
        $('#loading').css('visibility','visible')
@@ -83,9 +81,30 @@
     }//makeFacilityEnvelope
     
     function getFacilities(jd,closestType,distance){
-        facEnv=makeFacilityEnvelope(jd,500);
-        
-        var urlStr='http://coa-gis-imagery/COA_Internal_ArcGIS/rest/services/Publish/test_route/MapServer/0/query?text=&geometry='+facEnv+'&geometryType=esriGeometryEnvelope&inSR=2264&spatialRel=esriSpatialRelEnvelopeIntersects&relationParam=&objectIds=&where=&time=&returnIdsOnly=false&returnGeometry=true&maxAllowableOffset=&outSR=2264&outFields=objectid%2C&f=pjson'
+       
+
+       switch(closestType)
+            {
+            case 'ClosestFireStation':
+                facEnv=makeFacilityEnvelope(jd,10000);
+                var urlStr = 'http://coa-gis-imagery/COA_Internal_ArcGIS/rest/services/Publish/test_route/MapServer/1/query?text=&geometry='+facEnv+
+                             '&geometryType=esriGeometryEnvelope&inSR=2264&spatialRel=esriSpatialRelEnvelopeIntersects&relationParam=&objectIds=&where=&time='+
+                             '&returnIdsOnly=false&returnGeometry=true&maxAllowableOffset=&outSR=2264&outFields=label&f=pjson';              
+                break;
+            case 'ClosestHydrant':
+                facEnv=makeFacilityEnvelope(jd,500);
+                var urlStr = 'http://coa-gis-imagery/COA_Internal_ArcGIS/rest/services/Publish/test_route/MapServer/0/query?text=&geometry='+facEnv+
+                             '&geometryType=esriGeometryEnvelope&inSR=2264&spatialRel=esriSpatialRelEnvelopeIntersects&relationParam=&objectIds=&where=&time='+
+                             '&returnIdsOnly=false&returnGeometry=true&maxAllowableOffset=&outSR=2264&outFields=facilityid&f=pjson';              
+                 break;
+            default:  
+                facEnv=makeFacilityEnvelope(jd,10000);
+                var urlStr = 'http://coa-gis-imagery/COA_Internal_ArcGIS/rest/services/Publish/test_route/MapServer/1/query?text=&geometry='+facEnv+
+                             '&geometryType=esriGeometryEnvelope&inSR=2264&spatialRel=esriSpatialRelEnvelopeIntersects&relationParam=&objectIds=&where=&time='+
+                             '&returnIdsOnly=false&returnGeometry=true&maxAllowableOffset=&outSR=2264&outFields=label&f=pjson';              
+                break;
+            }//switch        
+           
 
          $.ajax({
                    url: urlStr,
@@ -109,8 +128,17 @@
 	   yStr=jd.candidates[0].location.y;
 	   
 	   console.log(facEnv); 
+
 	   
-	   var urlStr = 'http://coa-gis-imagery/COA_Internal_ArcGIS/rest/services/Publish/test_route/NAServer/'+closestType+'/solveClosestFacility?incidents='+xStr+'%2C'+yStr+'&facilities='+fac+'&barriers=&polylineBarriers=&polygonBarriers=&travelDirection=esriNATravelDirectionToFacility&defaultCutoff=&defaultTargetFacilityCount=1&outSR=2264&accumulateAttributeNames=Distance&impedanceAttributeName=Distance&restrictionAttributeNames=Use+One+Way&attributeParameterValues=&restrictUTurns=esriNFSBAllowBacktrack&useHierarchy=true&returnDirections=true&returnCFRoutes=true&returnFacilities=false&returnIncidents=false&returnBarriers=false&returnPolylineBarriers=false&returnPolygonBarriers=false&directionsLanguage=en-US&directionsStyleName=NA+Desktop&outputLines=esriNAOutputLineTrueShape&outputGeometryPrecision=&outputGeometryPrecisionUnits=esriUnknownUnits&directionsTimeAttributeName=Drive+Time&directionsLengthUnits=esriNAUMiles&f=pjson';
+	   var urlStr = 'http://coa-gis-imagery/COA_Internal_ArcGIS/rest/services/Publish/test_route/NAServer/'+closestType+
+	                '/solveClosestFacility?incidents='+xStr+'%2C'+yStr+'&facilities='+fac+'&barriers=&polylineBarriers='+
+	                '&polygonBarriers=&travelDirection=esriNATravelDirectionToFacility&defaultCutoff=&defaultTargetFacilityCount=1'+
+	                '&outSR=2264&accumulateAttributeNames=Distance&impedanceAttributeName=Distance&restrictionAttributeNames=Use+One+Way'+
+	                '&attributeParameterValues=&restrictUTurns=esriNFSBAllowBacktrack&useHierarchy=true&returnDirections=true&'+
+	                'returnCFRoutes=true&returnFacilities=false&returnIncidents=false&returnBarriers=false&returnPolylineBarriers=false'+
+	                '&returnPolygonBarriers=false&directionsLanguage=en-US&directionsStyleName=NA+Desktop&outputLines=esriNAOutputLineTrueShape'+
+	                '&outputGeometryPrecision=&outputGeometryPrecisionUnits=esriUnknownUnits&directionsTimeAttributeName=Drive+Time'+
+	                '&directionsLengthUnits=esriNAUMiles&f=pjson';
        var pt = '';
        var retVal;
        
@@ -132,7 +160,7 @@
    
    var getResults = function(data,closestType,distance){
         console.log('ajax success');
-        pt = getPoint(data); 
+        //pt = getPoint(data); 
         UpdateResults(data);
         getFacilities(data,closestType,distance)
         return pt;
@@ -140,15 +168,31 @@
        
     var makeFacilityList = function(data,jd,closestType,distance){
         console.log('ajax success');
-        //console.log(data.geometry.count);
         console.log(data);
         console.log(data.features.length);
-        theFacs='';
-        for(var i=0;i< data.features.length;i++){
-            theFacs+=data.features[i].geometry.x+','+data.features[i].geometry.y+';';
-       }
+
+
+            
+        theFacs='{"features":[';
         
-        theFacs=theFacs.substring(0, theFacs.length-1);
+
+        for(var i=0;i< data.features.length;i++){
+           switch(closestType)
+                {
+                case 'ClosestFireStation':
+                    theFacs+='{"geometry":{"x":'+data.features[i].geometry.x+',"y":'+data.features[i].geometry.y+'},"attributes":{"Name":"'+data.features[i].attributes.label+'"}},';
+                    break;
+                case 'ClosestHydrant':
+                    theFacs+='{"geometry":{"x":'+data.features[i].geometry.x+',"y":'+data.features[i].geometry.y+'},"attributes":{"Name":"'+data.features[i].attributes.facilityid+'"}},';
+                    break;   
+                default:  
+                    theFacs+='{"geometry":{"x":'+data.features[i].geometry.x+',"y":'+data.features[i].geometry.y+'},"attributes":{"Name":"'+data.features[i].attributes.label+'"}},';
+                    break;
+                }//switch            
+            
+       }
+        theFacs=theFacs.substring(0, theFacs.length-1); 
+        theFacs=theFacs+']}';
         console.log(theFacs);
         getClosest(jd,theFacs,closestType,distance);
         
@@ -201,38 +245,72 @@
         <div class="span9">
           <div class="row-fluid">
             <div class="span9" >
-              <h2>Search</h2>
-              <p>Put search here</p>
-                       <p> Enter an input address and the application will use the sample address locator to return the location for
-                        street addresses in the United States. </p>
-                        <br />Address:
-                        <input type="text" class="span9" id="address" value="70 court pz" />
-                        <br />Zip:
-                        <input type="text" class="span2" id="zone" value="28801" />
-                        <br />
-
-              <div id="Div2"></div>
-              <!-- data/address.json -->
-              <button type="submit" class="btn" id="BtnFire"  onclick="getAddress('ClosestFireStation','miles')" >Closest Fire Station</button>
-			  <button type="submit" class="btn" id="BtnHyd"  onclick="getAddress('ClosestHydrant','feet')" >Closest Hydrant</button>
+              <h2>STEP 1</h2>
+                       <p><b>Enter a street address.</b></p>
+                        <div>
+                            Address:&nbsp;<input type="text" class="span9" id="address" value="70 court pz" />
+                        </div>
+                        <div>
+                            Zip:&nbsp;<input type="text" class="span2" id="zone" value="28801" />
+                        </div>
             </div><!--/span-->
            </div>
         </div>
         
-  
+        <div class="span9">
+          <div class="row-fluid">
+            <div class="span9" >
+              <p>&nbsp;</p>
+            </div><!--/span-->
+           </div>
+        </div>
 
+        <div class="span9">
+          <div class="row-fluid">
+            <div class="span9" >
+               <h2>STEP 2</h2>
+               <p><b>Click to find the closest.</b></p>
+              <button type="submit" class="btn" id="Button1"  onclick="getAddress('ClosestFireStation','miles')" >Fire Station</button>
+			  <button type="submit" class="btn" id="Button2"  onclick="getAddress('ClosestHydrant','feet')" >Fire Hydrant</button>
+            </div><!--/span-->
+           </div>
+        </div>
         
+        <div class="span9">
+          <div class="row-fluid">
+            <div class="span9" >
+              <p>&nbsp;</p>
+            </div><!--/span-->
+           </div>
+        </div>
   
         <div class="span9">
           <div class="row-fluid">
             <div class="span9" >
-              <h2>Results</h2>
+              <h2>STEP 3</h2>
+              <p><b>Get Results.</b></p>
               <div id="results" ></div><div id = "loading" style="visibility:hidden"><img src="img/loading.gif" width="105" height="105"/> Seaching...</div>
             </div><!--/span-->
            </div>
         </div>
                  
-        <p><br/></p>
+        <div class="span9">
+          <div class="row-fluid">
+            <div class="span9" >
+              <p>&nbsp;</p>
+            </div><!--/span-->
+           </div>
+        </div>
+  
+        <div class="span9">
+          <div class="row-fluid">
+            <div class="span9" >
+              <h2>STEP 4</h2>
+              <p><b>View the map.</b></p>
+              <div id="map" ></div>
+            </div><!--/span-->
+           </div>
+        </div>
  
 
     </div> 
