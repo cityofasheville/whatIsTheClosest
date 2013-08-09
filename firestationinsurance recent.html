@@ -72,10 +72,12 @@
        $('#loading').css('visibility','visible')
        addressStr = $('#address').val();
        ZipStr = $('#zone').val();
-       var urlStr = 'http://gis.ashevillenc.gov/COA_ArcGIS_Server/rest/services/Buncombe_Address_Point/GeocodeServer/findAddressCandidates?Street='+addressStr+
-                    '&Zone='+ZipStr+'&outFields=&f=pjson';
-       var pt = [];
-       var retVal;
+       //var urlStr = 'http://gis.ashevillenc.gov/COA_ArcGIS_Server/rest/services/Buncombe_Address_Point/GeocodeServer/findAddressCandidates?Street='+addressStr+
+       //             '&Zone='+ZipStr+'&outFields=&f=pjson';
+        var urlStr =  'http://gis.ashevillenc.gov/COA_ArcGIS_Server/rest/services/'+
+                      'Buncombe_Streets_With_Zip/GeocodeServer/'+
+                      'findAddressCandidates?Street='+addressStr+
+                      '&Zone='+ZipStr+'&outFields=&f=pjson';
        
        $.ajax({
            url: urlStr,
@@ -107,10 +109,8 @@
        myJsonObject=JSON.parse(myLines);
        
        var startPt = '[{"type": "Point","coordinates":['+data.routes.features[0].geometry.paths[0][0]+']}]';
-       drawPoints(startPt,'test');
        var endPt = '[{"type": "Point","coordinates":['+data.routes.features[0].geometry.paths[0][(data.routes.features[0].geometry.paths[0].length-1)]+']}]'
-       drawPoints(endPt,'test');
-       
+
        var myStyle = {
            "color": "#ff7800",
            "weight": 10,
@@ -123,15 +123,28 @@
        
        var bounds = geoJSONLayer.getBounds();
        geoJSONLayer.addTo(map);
+       drawPoints(startPt,'start');
+       drawPoints(endPt,'end');
        map.fitBounds(bounds,100);
        map.zoomOut(1);    
     }
-    
+    //0B610B
+    function getColor(type){
+        switch (type) {
+            case 'start':
+                return "#0B610B";
+            case 'end':
+                return "#DF0101";
+            default:  
+                return "#ff7800";
+                break;
+        }   
+    }
     function drawPoints(GJfeat,type){
         GJfeatObject=JSON.parse(GJfeat);
         var geojsonMarkerOptions = {
             radius: 8,
-            fillColor: "#ff7800",
+            fillColor: getColor(type),
             color: "#000",
             weight: 1,
             opacity: 1,
