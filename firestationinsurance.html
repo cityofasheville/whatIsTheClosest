@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Fire Station Insurance COA</title>
+    <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <!-- Le styles -->
+    <link href="css/bootstrap.css" rel="stylesheet">
+    <style type="text/css">
+      body {
+        padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
+      }
+    </style>
+    <link href="css/bootstrap-responsive.css" rel="stylesheet">
+    
+  
+
+    <!-- Fav and touch icons -->
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="ico/apple-touch-icon-144-precomposed.png"/>
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="ico/apple-touch-icon-114-precomposed.png"/>
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="ico/apple-touch-icon-72-precomposed.png"/>
+    <link rel="apple-touch-icon-precomposed" href="ico/apple-touch-icon-57-precomposed.png"/>
+    <link rel="shortcut icon" href="ico/favicon.png"/>
+    <script type="text/javascript" src="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.js"></script>
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.css" />
+    <!--[if lte IE 8]>
+     <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.ie.css" />
+    <![endif]-->    <!-- <style type="text/javascript">#map { height: 180px; }</style> -->
+
+    <script type="text/javascript" src="js/jquery.js"></script>
+    <script type="text/javascript" src="js/bootstrap.js"></script>
+    <script type="text/javascript" language="javascript">
+
+
+   function UpdateResults(jd,idStr){
+         $('#results').append('The address&nbsp;' + jd.candidates[0].address + '');
+   }
+    
+   function getLatLong(jd){
+	   xStr=jd.candidates[0].location.x;
+	   yStr=jd.candidates[0].location.y;
+       
+       var urlStr = 'http://coa-gis-imagery/COA_Internal_ArcGIS/rest/services/Geometry/GeometryServer/'+
+                    'project?inSR=2264&outSR=4326&geometries='+xStr+'%2C'+yStr+'6&f=pjson';
+                            
+       $.ajax({
+           url: urlStr,
+           dataType: 'jsonp',
+           crossDomain: true,
+           jsonpCallback: 'MyJSONPCallback', // specify the callback name if you're hard-coding it
+           jsonp : "callback",
+           success:function(data){zoomMap(data);},
+           error:function(data){console.log('ajax failed');}
+       });
+       	   
+   }
+   
+   var zoomMap = function(data){
+	   xStr=data.geometries[0].x;
+	   yStr=data.geometries[0].y;
+
+	   map.setView(new L.LatLng(yStr, xStr), 15);
+	   return '';
+	   
+   }
+   
+   function getAddress(closestType,distance){
+       clearMap();
+       $('#results').html('');
+       $('#loading').css('visibility','visible')
+       addressStr = $('#address').val();
+       ZipStr = $('#zone').val();
+       var urlStr =  'http://gis.ashevillenc.gov/COA_ArcGIS_Server/rest/services/'+
+                      'Buncombe_Streets_With_Zip/GeocodeServer/'+
+                      'findAddressCandidates?Street='+addressStr+
+                      '&Zone='+ZipStr+'&outFields=&f=pjson';
+       
+       $.ajax({
+           url: urlStr,
+           dataType: 'jsonp',
+           crossDomain: true,
+           jsonpCallback: 'MyJSONPCallback', // specify the callback name if you're hard-coding it
+           jsonp : "callback",
+           success:function(data){getResults(data,closestType,distance);},
+           error:function(data){console.log('ajax failed');}
+       });
+    }
+   
+
+    function drawRoute(data){
+       var geojsonGroup = new L.LayerGroup();
+       
+       var path=data.routes.features[0].geometry.paths[0]
+       var myLines = '[{"type": "LineString","coordinates":['
+       for(var i=0;i< data.routes.features[0].geometry.paths.length;i++)
+       {
+            for(var j=0;j< data.routes.features[0].geometry.paths[i].length;j++){
+                myLines += '['+data.routes.features[0].geometry.paths[i][j]+'],'
+            }
+       }
+       
+       myLines=myLines.substring(0, myLines.length-1)
+       myLines += ']}]'
+       myJsonObject=JSON.parse(myLines);
+       
+       var startPt = '[{"type": "Point","coordinates":['+data.routes.features[0].geometry.paths[0][0]+']}]';
+       var endPt = '[{"type": "Point","coordinates":['+data.routes.features[0].geometry.paths[0][(data.routes.features[0].geometry.paths[0].length-1)]+']}]'
+
+       var myStyle = {
+           "color": "#ff7800",
+           "weight": 10,
+           "opacity": 0.65
+       };
+
+       geoJSONLayer = L.geoJson(myJsonObject, {
+           style: myStyle
+       });
+       
+       var bounds = geoJSONLayer.getBounds();
+       geoJSONLayer.addTo(map);
+       drawPoints(startPt,'start');
+       drawPoints(endPt,'end');
+       map.fitBounds(bounds,100);
+       map.zoomOut(1);    
+    }
+    
+    function getColor(type){
+        switch (type) {
+            case 'start':
+                return "#0B610B";
+            case 'end':
+                return "#DF0101";
+            default:  
+                return "#ff7800";
+                break;
+        }   
+    }
+    
+    
+    function drawPoints(GJfeat,type){
+        GJfeatObject=JSON.parse(GJfeat);
+        var geojsonMarkerOptions = {
+            radius: 8,
+            fillColor: getColor(type),
+            color: "#000",
+            weight: 1,
+            opacity: 1,
+            fillOpacity: 0.8
+            
+        };
+        
+        var gjPT = L.geoJson(GJfeatObject, {
+            pointToLayer: function (feature, latlng) {
+                return L.circleMarker(latlng, geojsonMarkerOptions);
+            }
+        });
+
+       gjPT.addTo(map);
+           
+    }
+    
+    function clearMap() {
+        for(i in map._layers) {
+            if(map._layers[i]._path != undefined) {
+                try {
+                    map.removeLayer(map._layers[i]);
+                }
+                catch(e) {
+                    //console.log("problem with " + e + map._layers[i]);
+                }
+            }
+        }
+    }
+        
+    function makeFacilityEnvelope(jd,distance){
+	   xStr=jd.candidates[0].location.x;
+	   yStr=jd.candidates[0].location.y;
+	   
+	   maxX=parseFloat(xStr)+parseFloat(distance);
+	   maxY=parseFloat(yStr)+parseFloat(distance);
+
+	   minX=parseFloat(xStr)-parseFloat(distance);
+	   minY=parseFloat(yStr)-parseFloat(distance);
+	   
+	   retVal=maxX+','+maxY+','+minX+','+minY;
+	   
+	   return retVal;
+	   
+	   
+    }//makeFacilityEnvelope
+    
+    function getFacilities(jd,closestType,distance){
+       
+
+       switch(closestType)
+            {
+            case 'ClosestFireStation':
+                facEnv=makeFacilityEnvelope(jd,10000);
+                var urlStr = 'http://coa-gis-imagery/COA_Internal_ArcGIS/rest/services/Publish/test_route/MapServer/1/query?text=&geometry='+facEnv+
+                             '&geometryType=esriGeometryEnvelope&inSR=2264&spatialRel=esriSpatialRelEnvelopeIntersects&relationParam=&objectIds=&where=&time='+
+                             '&returnIdsOnly=false&returnGeometry=true&maxAllowableOffset=&outSR=2264&outFields=label&f=pjson';              
+                break;
+            case 'ClosestHydrant':
+                facEnv=makeFacilityEnvelope(jd,500);
+                var urlStr = 'http://coa-gis-imagery/COA_Internal_ArcGIS/rest/services/Publish/test_route/MapServer/0/query?text=&geometry='+facEnv+
+                             '&geometryType=esriGeometryEnvelope&inSR=2264&spatialRel=esriSpatialRelEnvelopeIntersects&relationParam=&objectIds=&where=&time='+
+                             '&returnIdsOnly=false&returnGeometry=true&maxAllowableOffset=&outSR=2264&outFields=facilityid&f=pjson';              
+                 break;
+            default:  
+                facEnv=makeFacilityEnvelope(jd,10000);
+                var urlStr = 'http://coa-gis-imagery/COA_Internal_ArcGIS/rest/services/Publish/test_route/MapServer/1/query?text=&geometry='+facEnv+
+                             '&geometryType=esriGeometryEnvelope&inSR=2264&spatialRel=esriSpatialRelEnvelopeIntersects&relationParam=&objectIds=&where=&time='+
+                             '&returnIdsOnly=false&returnGeometry=true&maxAllowableOffset=&outSR=2264&outFields=label&f=pjson';              
+                break;
+            }//switch        
+           
+
+         $.ajax({
+                   url: urlStr,
+                   dataType: 'jsonp',
+                   crossDomain: true,
+                   jsonpCallback: 'MyJSONPCallback', // specify the callback name if you're hard-coding it
+                   jsonp : "callback",
+                   success:function(data){makeFacilityList(data,jd,closestType,distance);},
+                   error:function(data){console.log('ajax failed1');$('#loading').css('visibility','hidden');}
+        		   
+               });        
+        
+        return urlStr;
+    }//getFacilities
+    
+    function getClosest(jd,fac,closestType,distance){
+         
+       addressStr = $('#address').val();
+       ZipStr = $('#zone').val();
+	   xStr=jd.candidates[0].location.x;
+	   yStr=jd.candidates[0].location.y;
+	   
+	   //console.log(facEnv); 
+
+	   
+	   var urlStr = 'http://coa-gis-imagery/COA_Internal_ArcGIS/rest/services/Publish/test_route/NAServer/'+closestType+
+	                '/solveClosestFacility?incidents='+xStr+'%2C'+yStr+'&facilities='+fac+'&barriers=&polylineBarriers='+
+	                '&polygonBarriers=&travelDirection=esriNATravelDirectionToFacility&defaultCutoff=&defaultTargetFacilityCount=1'+
+	                '&outSR=4326&accumulateAttributeNames=Distance&impedanceAttributeName=Distance&restrictionAttributeNames=Use+One+Way'+
+	                '&attributeParameterValues=&restrictUTurns=esriNFSBAllowBacktrack&useHierarchy=true&returnDirections=true&'+
+	                'returnCFRoutes=true&returnFacilities=false&returnIncidents=false&returnBarriers=false&returnPolylineBarriers=false'+
+	                '&returnPolygonBarriers=false&directionsLanguage=en-US&directionsStyleName=NA+Desktop&outputLines=esriNAOutputLineTrueShape'+
+	                '&outputGeometryPrecision=&outputGeometryPrecisionUnits=esriUnknownUnits&directionsTimeAttributeName=Drive+Time'+
+	                '&directionsLengthUnits=esriNAUMiles&f=pjson';
+       var pt = '';
+       var retVal;
+       
+      
+       $.ajax({
+           url: urlStr,
+           dataType: 'jsonp',
+           crossDomain: true,
+           jsonpCallback: 'MyJSONPCallback', // specify the callback name if you're hard-coding it
+           jsonp : "callback",
+           success:function(data){dispResults(data,distance,closestType);},
+           error:function(data){console.log('ajax failed1');$('#loading').css('visibility','hidden');}
+		   
+       });
+       
+   }//getClosest
+   
+    
+   
+   var getResults = function(data,closestType,distance){
+        console.log('ajax success');
+        UpdateResults(data);
+        getFacilities(data,closestType,distance)
+        //getLatLong(data);
+        return data;
+        
+    }//getResults
+       
+    var makeFacilityList = function(data,jd,closestType,distance){
+        theFacs='{"features":[';
+
+        for(var i=0;i< data.features.length;i++){
+           switch(closestType)
+                {
+                case 'ClosestFireStation':
+                    theFacs+='{"geometry":{"x":'+data.features[i].geometry.x+',"y":'+data.features[i].geometry.y+'},"attributes":{"Name":"'+data.features[i].attributes.label+'"}},';
+                    break;
+                case 'ClosestHydrant':
+                    theFacs+='{"geometry":{"x":'+data.features[i].geometry.x+',"y":'+data.features[i].geometry.y+'},"attributes":{"Name":"'+data.features[i].attributes.facilityid+'"}},';
+                    break;   
+                default:  
+                    theFacs+='{"geometry":{"x":'+data.features[i].geometry.x+',"y":'+data.features[i].geometry.y+'},"attributes":{"Name":"'+data.features[i].attributes.label+'"}},';
+                    break;
+                }//switch            
+            
+       }
+        theFacs=theFacs.substring(0, theFacs.length-1); 
+        theFacs=theFacs+']}';
+        //console.log(theFacs);
+        getClosest(jd,theFacs,closestType,distance);
+        
+    }//makeFacilityList
+    var dispResults = function(data,distance,closestType){
+        console.log(distance);
+        $('#loading').css('visibility','hidden');
+        
+        switch(distance){
+            case 'feet':
+                distTemp = parseFloat( data.routes.features[0].attributes.Total_Distance.toFixed(2) ).toFixed(2);
+                dist = parseFloat(distTemp*5280).toFixed(2)
+                distMsg = 'Feet';
+                break;
+            case 'miles':
+                dist = parseFloat( data.routes.features[0].attributes.Total_Distance.toFixed(2) ).toFixed(2);
+                distMsg = 'Miles';
+                break;
+            default:
+                dist = parseFloat( data.routes.features[0].attributes.Total_Distance.toFixed(2) ).toFixed(2);
+                distMsg = 'Miles';
+                break;
+        }
+        switch(closestType){
+            case 'ClosestFireStation':
+                typeMsg = 'Fire Station';
+                break;
+            case 'ClosestHydrant':
+                typeMsg = 'Fire Hydrant';
+                break;
+            default:
+                typeMsg = 'Fire Station';
+                break;
+        };
+        
+        clMsg='&nbsp;<b>Is Closest to</b>&nbsp;'
+        destMsg = data.routes.features[0].attributes.Name.replace('Location 1 - ','');
+        
+        $('#results').append(clMsg);
+        $('#results').append(typeMsg+' '+destMsg+'&nbsp;('+dist+'&nbsp;'+distMsg+')');
+        
+           
+        drawRoute(data)
+    }   
+	function onEachFeature() {
+		var popupContent = "<p>test!</p>";
+	    layer.bindPopup(popupContent);
+	}
+	 
+
+
+   </script>
+  
+  <style type="text/css">
+    #map { height: 400px;
+           width:  100%;
+          }
+  </style>
+
+
+  </head>
+
+
+  <body data-twttr-rendered="true">
+
+    <div class="container bs-docs-container">
+
+
+
+
+      <p> <h2 class="text-info" >What's The Closest?</h2></p>
+
+      <div class="panel panel-info">
+        <div class="panel-heading"><h3>To an address</h3></div>
+        <fieldset>
+          <div class="form-group">
+            <label class="text-info" for="address">Enter the Address</label>
+            <input type="text" class="form-control text-primary" id="address" placeholder="70 court pz"  value="70 court pz">
+          </div>
+          <div class="form-group">
+            <label class="text-info" for="zone">Enter the Zip Code</label>
+            <input type="text" class="form-control text-primary" id="zone" placeholder="28801"  value="28801">
+          </div>
+          <label class="text-info" for="Button1">Click to find the closest </label>
+          <button type="submit" class="btn btn-primary btn-sm"  id="Button1"  onclick="getAddress('ClosestFireStation','miles')">Fire Station</button>
+          <label class="text-info" for="Button2"> or </label>
+          <button type="submit" class="btn btn-primary btn-sm"  id="Button2"  onclick="getAddress('ClosestHydrant','feet')">Fire Hydrant</button>
+        </fieldset>
+      </div>
+
+      <div class="panel panel-info">
+        <div class="panel-heading text-info"><h3>The Results  <span id="loading" class="text-info" style="visibility:hidden"><img   src="img/loading.gif" /></span></h3></div>
+         <div id="results" class="text-info" ></div>
+         
+      </div>
+
+      <div class="panel panel-info">
+        <div class="panel-heading"><h3 class="text-info">The Map</h3></div>
+          <div id="map" ></div>
+      </div>
+
+
+    </div> 
+
+
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script type="text/javascript">
+        var map = L.map('map').setView([35.593,-82.5488], 13);
+
+		L.tileLayer('http://{s}.tile.cloudmade.com/{key}/22677/256/{z}/{x}/{y}.png', {
+			attribution: 'Map data &copy; 2011 OpenStreetMap contributors, Imagery &copy; 2012 CloudMade',
+			key: 'BC9A493B41014CAABB98F0471D759707'
+		}).addTo(map);
+
+    </script>
+    <script type="text/javascript" src="js/bootstrap-transition.js"></script>
+    <script type="text/javascript" src="js/bootstrap-alert.js"></script>
+    <script type="text/javascript" src="js/bootstrap-modal.js"></script>
+    <script type="text/javascript" src="js/bootstrap-dropdown.js"></script>
+    <script type="text/javascript" src="js/bootstrap-scrollspy.js"></script>
+    <script type="text/javascript" src="js/bootstrap-tab.js"></script>
+    <script type="text/javascript" src="js/bootstrap-tooltip.js"></script>
+    <script type="text/javascript" src="js/bootstrap-popover.js"></script>
+    <script type="text/javascript" src="js/bootstrap-button.js"></script>
+    <script type="text/javascript" src="js/bootstrap-collapse.js"></script>
+    <script type="text/javascript" src="js/bootstrap-carousel.js"></script>
+    <script type="text/javascript" src="js/bootstrap-typeahead.js"></script>
+ 
+  </body>
+</html>

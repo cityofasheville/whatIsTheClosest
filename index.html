@@ -138,31 +138,32 @@
 
         map.addLayer(routeGraphicLayer);
 
-        var facilitiesGraphicsLayer = new esri.layers.GraphicsLayer();
-        var facilityRenderer = new esri.renderer.SimpleRenderer(facilityPointSymbol);
-        facilitiesGraphicsLayer.setRenderer(facilityRenderer);
+        //var facilitiesGraphicsLayer = new esri.layers.GraphicsLayer();
+        //var facilityRenderer = new esri.renderer.SimpleRenderer(facilityPointSymbol);
+        //facilitiesGraphicsLayer.setRenderer(facilityRenderer);
        
-        map.addLayer(facilitiesGraphicsLayer);
+        //map.addLayer(facilitiesGraphicsLayer);
         //alert(map.spatialReference.wkid)
         //facilitiesGraphicsLayer.add(new esri.Graphic(new esri.geometry.Point(-82.5488,35.593,map.spatialReference)));
-        facilitiesGraphicsLayer.add(new esri.Graphic(new esri.geometry.Point(942559.3131500304,690578.6353148625,map.spatialReference)));
-        facilitiesGraphicsLayer.add(new esri.Graphic(new esri.geometry.Point(941771.9345977657,691136.1560300763,map.spatialReference)));
-        facilitiesGraphicsLayer.add(new esri.Graphic(new esri.geometry.Point(941710.1738841726,692662.5279517361,map.spatialReference))); 
-        facilitiesGraphicsLayer.add(new esri.Graphic(new esri.geometry.Point(943977.6743689503,690774.4147076021,map.spatialReference))); 
-        facilitiesGraphicsLayer.add(new esri.Graphic(new esri.geometry.Point(943995.3202871197,689256.8657450271,map.spatialReference))); 
+        //facilitiesGraphicsLayer.add(new esri.Graphic(new esri.geometry.Point(942559.3131500304,690578.6353148625,map.spatialReference)));
+        //facilitiesGraphicsLayer.add(new esri.Graphic(new esri.geometry.Point(941771.9345977657,691136.1560300763,map.spatialReference)));
+        //facilitiesGraphicsLayer.add(new esri.Graphic(new esri.geometry.Point(941710.1738841726,692662.5279517361,map.spatialReference))); 
+        //facilitiesGraphicsLayer.add(new esri.Graphic(new esri.geometry.Point(943977.6743689503,690774.4147076021,map.spatialReference))); 
+        //facilitiesGraphicsLayer.add(new esri.Graphic(new esri.geometry.Point(943995.3202871197,689256.8657450271,map.spatialReference))); 
    
-        var facilities = new esri.tasks.FeatureSet();
-        facilities.features = facilitiesGraphicsLayer.graphics;
+        //var facilities = new esri.tasks.FeatureSet();
+        //facilities.features = facilitiesGraphicsLayer.graphics;
         
-        params.facilities = facilities;
+        params.facilities = '';
         params.outSpatialReference = map.spatialReference;
        
        
       });
-      closestFacilityTask = new esri.tasks.ClosestFacilityTask("http://coa-gis-imagery/COA_Internal_ArcGIS/rest/services/Publish/test_route/NAServer/Closest Facility");
-
-        locator = new esri.tasks.Locator("http://gis.ashevillenc.gov/COA_ArcGIS_Server/rest/services/Buncombe_Address_Point/GeocodeServer");
-        dojo.connect(locator, "onAddressToLocationsComplete", showResults);
+      closestFacilityTask = new esri.tasks.ClosestFacilityTask("http://coa-gis-imagery/COA_Internal_ArcGIS/rest/services/Publish/test_route/NAServer/ClosestFireStation");
+      closestHydrantTask = new esri.tasks.ClosestFacilityTask("http://coa-gis-imagery/COA_Internal_ArcGIS/rest/services/Publish/test_route/NAServer/ClosestHydrant");
+         
+      locator = new esri.tasks.Locator("http://gis.ashevillenc.gov/COA_ArcGIS_Server/rest/services/Buncombe_Address_Point/GeocodeServer");
+      dojo.connect(locator, "onAddressToLocationsComplete", showResults);
                                                                 
     }
     function clearGraphics() {
@@ -205,7 +206,9 @@
       //solve 
       closestFacilityTask.solve(params,function(solveResult){
         var directions = solveResult.directions;
-      
+        
+        alert(solveResult.directions[0].totalLength)
+        
         dojo.forEach(solveResult.routes, function(route, index){
           //build an array of route info
           
@@ -234,6 +237,7 @@
 
       function locate() {
         map.graphics.clear();
+        clearGraphics();
         var address = {"Street":dojo.byId("address").value,"Zone":dojo.byId("zone").value};
         locator.outSpatialReference= new esri.SpatialReference({wkid: 4326});//map.spatialReference; //new esri.SpatialReference({wkid: 2264});
         var options = {
@@ -252,16 +256,98 @@
         symbol.setColor(new dojo.Color([153,0,51,0.75]));
 
         var geom;
+
         
         dojo.every(candidates,function(candidate){
           console.log(candidate.score);
           if (candidate.score > 80) {
             console.log(candidate.location);
+            
+
+
+                  
             var attributes = { address: candidate.address, score:candidate.score, locatorName:candidate.attributes.Loc_name };   
             geom = candidate.location;
             var graphic = new esri.Graphic(geom, symbol, attributes, infoTemplate);
             //add a graphic to the map at the geocoded location
             map.graphics.add(graphic);
+
+       var inPoint = new esri.geometry.Point(geom.x,geom.y,map.spatialReference);
+       //alert(geom.x);
+      var location = new esri.Graphic(inPoint);
+      incidentsGraphicsLayer.add(location);
+      
+      var features = [];
+      features.push(location);
+      var incidents = new esri.tasks.FeatureSet();
+      incidents.features = features;
+      params.incidents = incidents;
+
+      dojo.connect(routeGraphicLayer,"onMouseOver", function(evt){
+        //clear existing directions and highlight symbol
+        map.graphics.clear();
+        
+        dojo.byId("directionsDiv").innerHTML= "Hover over the route to view directions";
+        
+        var highlightSymbol = new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new dojo.Color([0,255,255],0.25), 4.5);
+        var highlightGraphic = new esri.Graphic(evt.graphic.geometry,highlightSymbol);
+        
+        map.graphics.add(highlightGraphic);
+        dojo.byId("directionsDiv").innerHTML = esri.substitute(evt.graphic.attributes,"${*}");
+
+      });
+
+      //solve 
+      closestFacilityTask.solve(params,function(solveResult){
+        var directions = solveResult.directions;
+      
+        dojo.forEach(solveResult.routes, function(route, index){
+          //build an array of route info
+          
+          var attr = dojo.map(solveResult.directions[index].features,function(feature){
+            
+            return feature.attributes.text;
+          });
+          var infoTemplate = new esri.InfoTemplate("Attributes", "${*}");
+          
+          route.setInfoTemplate(infoTemplate);
+          route.setAttributes(attr);
+          
+          routeGraphicLayer.add(route);
+          dojo.byId("directionsDiv").innerHTML = "Hover over the route to view directions";
+        });
+        
+        //display any messages
+        if(solveResult.messages.length > 0){
+          dojo.byId("directionsDiv").innerHTML = "<b>Error:</b> " + solveResult.messages[0];
+        }      
+      });
+      
+      closestHydrantTask.solve(params,function(solveResult){
+        var directions = solveResult.directions;
+      
+        dojo.forEach(solveResult.routes, function(route, index){
+          //build an array of route info
+          
+          var attr = dojo.map(solveResult.directions[index].features,function(feature){
+            
+            return feature.attributes.text;
+          });
+          var infoTemplate = new esri.InfoTemplate("Attributes", "${*}");
+          
+          route.setInfoTemplate(infoTemplate);
+          route.setAttributes(attr);
+          
+          routeGraphicLayer.add(route);
+          dojo.byId("directionsDiv").innerHTML = "Hover over the route to view directions";
+        });
+        
+        //display any messages
+        if(solveResult.messages.length > 0){
+          dojo.byId("directionsDiv").innerHTML = "<b>Error:</b> " + solveResult.messages[0];
+        }      
+      });
+                        
             //add a text symbol to the map listing the location of the matched address.
             var displayText = candidate.address;
             var font = new esri.symbol.Font("16pt",esri.symbol.Font.STYLE_NORMAL, esri.symbol.Font.VARIANT_NORMAL,esri.symbol.Font.WEIGHT_BOLD,"Helvetica");
