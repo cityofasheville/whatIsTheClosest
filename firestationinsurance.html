@@ -33,7 +33,7 @@
 
 
    function UpdateResults(jd,idStr){
-         $('#results').append('The address&nbsp;' + jd.candidates[0].address + '');
+         $('#results').append('The address&nbsp;<span  class="text-success" ><strong>' + jd.candidates[0].address + '</strong></span>');
    }
     
    function getLatLong(jd){
@@ -107,7 +107,7 @@
        var endPt = '[{"type": "Point","coordinates":['+data.routes.features[0].geometry.paths[0][(data.routes.features[0].geometry.paths[0].length-1)]+']}]'
 
        var myStyle = {
-           "color": "#ff7800",
+           "color": "#C09853",
            "weight": 10,
            "opacity": 0.65
        };
@@ -127,9 +127,9 @@
     function getColor(type){
         switch (type) {
             case 'start':
-                return "#0B610B";
+                return "#468847";
             case 'end':
-                return "#DF0101";
+                return "#B94A48";
             default:  
                 return "#ff7800";
                 break;
@@ -331,11 +331,12 @@
                 break;
         };
         
-        clMsg='&nbsp;<b>Is Closest to</b>&nbsp;'
+        clMsg='&nbsp;Is Closest to&nbsp;'
         destMsg = data.routes.features[0].attributes.Name.replace('Location 1 - ','');
         
         $('#results').append(clMsg);
-        $('#results').append(typeMsg+' '+destMsg+'&nbsp;('+dist+'&nbsp;'+distMsg+')');
+        $('#results').append('<span class="text-danger"><strong>'+typeMsg+' '+destMsg+'&nbsp;</strong></span>'+
+                             '<span class="text-warning"><strong>('+dist+'&nbsp;'+distMsg+')</strong></span>');
         
            
         drawRoute(data)
@@ -359,17 +360,10 @@
   </head>
 
 
-  <body data-twttr-rendered="true">
-
+  <body data-twttr-rendered="true" background-color="#F0F0F0">
     <div class="container bs-docs-container">
-
-
-
-
-      <p> <h2 class="text-info" >What's The Closest?</h2></p>
-
-      <div class="panel panel-info">
-        <div class="panel-heading"><h3>To an address</h3></div>
+      <div class="panel panel-primary">
+        <div class="panel-heading"><h2>What's The Closest?</h2></div>
         <fieldset>
           <div class="form-group">
             <label class="text-info" for="address">Enter the Address</label>
@@ -387,16 +381,18 @@
         </fieldset>
       </div>
 
-      <div class="panel panel-info">
-        <div class="panel-heading text-info"><h3>The Results  <span id="loading" class="text-info" style="visibility:hidden"><img   src="img/loading.gif" /></span></h3></div>
-         <div id="results" class="text-info" ></div>
-         
+      <div class="panel panel-primary">
+        <div class="panel-heading text-info">
+          <h3>The Results  
+            <span id="loading" class="text-info" style="visibility:hidden">
+              <img   src="img/loading.gif" />
+            </span>
+          </h3>
+        </div>
+        <div  class="panel text-info" id="results" ></div>
+        <div  class="panel" id="map" ></div>
       </div>
 
-      <div class="panel panel-info">
-        <div class="panel-heading"><h3 class="text-info">The Map</h3></div>
-          <div id="map" ></div>
-      </div>
 
 
     </div> 
