@@ -195,7 +195,7 @@
        switch(closestType)
             {
             case 'ClosestFireStation':
-                facEnv=makeFacilityEnvelope(jd,25000);
+                facEnv=makeFacilityEnvelope(jd,15000);
                 var urlStr = 'http://coa-gis-imagery/COA_Internal_ArcGIS/rest/services/Publish/test_route/MapServer/1/query?text=&geometry='+facEnv+
                              '&geometryType=esriGeometryEnvelope&inSR=2264&spatialRel=esriSpatialRelEnvelopeIntersects&relationParam=&objectIds=&where=&time='+
                              '&returnIdsOnly=false&returnGeometry=true&maxAllowableOffset=&outSR=2264&outFields=label&f=pjson';              
@@ -207,7 +207,7 @@
                              '&returnIdsOnly=false&returnGeometry=true&maxAllowableOffset=&outSR=2264&outFields=facilityid&f=pjson';              
                  break;
             default:  
-                facEnv=makeFacilityEnvelope(jd,25000);
+                facEnv=makeFacilityEnvelope(jd,15000);
                 var urlStr = 'http://coa-gis-imagery/COA_Internal_ArcGIS/rest/services/Publish/test_route/MapServer/1/query?text=&geometry='+facEnv+
                              '&geometryType=esriGeometryEnvelope&inSR=2264&spatialRel=esriSpatialRelEnvelopeIntersects&relationParam=&objectIds=&where=&time='+
                              '&returnIdsOnly=false&returnGeometry=true&maxAllowableOffset=&outSR=2264&outFields=label&f=pjson';              
