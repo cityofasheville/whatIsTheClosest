@@ -369,34 +369,34 @@
 
 
 
-      <p> <h2>What's The Closest?</h2></p>
+      <p> <h2 class="text-info" >What's The Closest?</h2></p>
 
       <div class="panel panel-info">
         <div class="panel-heading"><h3>To an address</h3></div>
         <fieldset>
           <div class="form-group">
-            <label for="address">Enter the Address</label>
+            <label class="text-info" for="address">Enter the Address</label>
             <input type="text" class="form-control" id="address" placeholder="70 court pz"  value="70 court pz">
           </div>
           <div class="form-group">
-            <label for="zone">Enter the Zip Code</label>
+            <label class="text-info" for="zone">Enter the Zip Code</label>
             <input type="text" class="form-control" id="zone" placeholder="28801"  value="28801">
           </div>
-          <label for="Button1">Click to find the closest </label>
+          <label class="text-info" for="Button1">Click to find the closest </label>
           <button type="submit" class="btn btn-primary btn-sm"  id="Button1"  onclick="getAddress('ClosestFireStation','miles')">Fire Station</button>
-          <label for="Button2"> or </label>
+          <label class="text-info" for="Button2"> or </label>
           <button type="submit" class="btn btn-primary btn-sm"  id="Button2"  onclick="getAddress('ClosestHydrant','feet')">Fire Hydrant</button>
         </fieldset>
       </div>
 
       <div class="panel panel-info">
-        <div class="panel-heading"><h3>The Results  <span id="loading" style="visibility:hidden"><img   src="img/loading2.gif" /></span></h3></div>
-         <div id="results" ></div>
+        <div class="panel-heading text-info"><h3>The Results  <span id="loading" class="text-info" style="visibility:hidden"><img   src="img/loading2.gif" /></span></h3></div>
+         <div id="results" class="text-info" ></div>
          
       </div>
 
       <div class="panel panel-info">
-        <div class="panel-heading"><h3>The Map</h3></div>
+        <div class="panel-heading"><h3 class="text-info">The Map</h3></div>
           <div id="map" ></div>
       </div>
 
