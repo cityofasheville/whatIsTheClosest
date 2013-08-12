@@ -15,7 +15,7 @@
       }
     </style>
     <link href="css/bootstrap-responsive.css" rel="stylesheet">
-
+    
   
 
     <!-- Fav and touch icons -->
@@ -31,6 +31,7 @@
     <![endif]-->    <!-- <style type="text/javascript">#map { height: 180px; }</style> -->
 
     <script type="text/javascript" src="js/jquery.js"></script>
+    <script type="text/javascript" src="js/bootstrap.js"></script>
     <script type="text/javascript" language="javascript">
 
 
@@ -333,7 +334,7 @@
                 break;
         };
         
-        clMsg='<br/>&nbsp;&nbsp;&nbsp;<b>Is Closest to</b><br/>'
+        clMsg='&nbsp;<b>Is Closest to</b>&nbsp;'
         destMsg = data.routes.features[0].attributes.Name.replace('Location 1 - ','');
         
         $('#results').append(clMsg);
@@ -345,119 +346,60 @@
 	function onEachFeature() {
 		var popupContent = "<p>test!</p>";
 	    layer.bindPopup(popupContent);
-	}	 
+	}
+	 
+
+
    </script>
   
   <style type="text/css">
-    body,html,#main{margin:0;padding:0;height:100%;width:100%;}
-    .panel {
-    -moz-border-radius: 6px;
-    -webkit-border-radius: 6px;
-    -moz-box-shadow: 0px 6px 3px -3px #888;
-    -webkit-box-shadow: 0px 6px 3px -3px #888;
-    box-shadow: 0px 6px 3px -3px #888;
-    border: 2px solid #86942A;
-    margin: 5px 5px 5px 5px;
-  }
-  #map { height: 400px;
-         width:  600px;
-        }
+    #map { height: 400px;
+           width:  600px;
+          }
   </style>
-  
 
-  
+
   </head>
 
-  <body>
 
-    
+  <body data-twttr-rendered="true">
 
-    <div class="container">
-
-        <div class="span9">
-          <div class="row-fluid">
-            <div class="span9" >
-              <h3>STEP 1</h3>
-                       <p><b>Enter a street address.</b></p>
-                        <div>
-                            Address:&nbsp;<input type="text" class="span9" id="address" value="70 court pz" />
-                        </div>
-                        <div>
-                            Zip:&nbsp;<input type="text" class="span2" id="zone" value="28801" />
-                        </div>
-            </div><!--/span-->
-           </div>
-        </div>
-        
-         <!--        
-        <div class="span9">
-          <div class="row-fluid">
-            <div class="span9" >
-              <p>&nbsp;</p>
-            </div>/span
-           </div>
-        </div>
-        -->
+    <div class="container bs-docs-container">
 
 
-        <div class="span9">
-          <div class="row-fluid">
-            <div class="span9" >
-               <h3>STEP 2</h3>
-               <p><b>Click to find the closest.</b></p>
-              <button type="submit" class="btn" id="Button1"  onclick="getAddress('ClosestFireStation','miles')" >Fire Station</button>
-			  <button type="submit" class="btn" id="Button2"  onclick="getAddress('ClosestHydrant','feet')" >Fire Hydrant</button>
-            </div><!--/span-->
-           </div>
-        </div>
-        
-         <!--        
-        <div class="span9">
-          <div class="row-fluid">
-            <div class="span9" >
-              <p>&nbsp;</p>
-            </div>/span
-           </div>
-        </div>
-        -->
-  
-        <div class="span9">
-          <div class="row-fluid">
-            <div class="span9" >
-              <h3>STEP 3</h3>
-              <p><b>See the results.</b></p>
-              <div id="results" ><p>&nbsp;</p></div><div id = "loading" style="visibility:hidden"><img src="img/loading.gif" width="105" height="105"/> Seaching...</div>
-            </div><!--/span-->
-           </div>
-        </div>
-        
-         <!--        
-        <div class="span9">
-          <div class="row-fluid">
-            <div class="span9" >
-              <p>&nbsp;</p>
-            </div>/span
-           </div>
-        </div>
-        -->
-        
-        <div class="span9">
-          <div class="row-fluid">
-            <div class="span9" >
-              <h3>STEP 4</h3>
-              <p><b>View the map.</b></p>
-              <div id="map" ></div>
-            </div><!--/span-->
-           </div>
-        </div>
- 
-         <div class="span9">
-          <div class="row-fluid">
-            <div class="span9" >
-              <p>&nbsp;</p>
-            </div><!--/span-->
-           </div>
-        </div>
+
+
+      <p> <h2>What's The Closest?</h2></p>
+
+      <div class="panel panel-info">
+        <div class="panel-heading"><h3>To an address</h3></div>
+        <fieldset>
+          <div class="form-group">
+            <label for="address">Enter the Address</label>
+            <input type="text" class="form-control" id="address" placeholder="70 court pz"  value="70 court pz">
+          </div>
+          <div class="form-group">
+            <label for="zone">Enter the Zip Code</label>
+            <input type="text" class="form-control" id="zone" placeholder="28801"  value="28801">
+          </div>
+          <label for="Button1">Click to find the closest </label>
+          <button type="submit" class="btn btn-primary btn-sm"  id="Button1"  onclick="getAddress('ClosestFireStation','miles')">Fire Station</button>
+          <label for="Button2"> or </label>
+          <button type="submit" class="btn btn-primary btn-sm"  id="Button2"  onclick="getAddress('ClosestHydrant','feet')">Fire Hydrant</button>
+        </fieldset>
+      </div>
+
+      <div class="panel panel-info">
+        <div class="panel-heading"><h3>The Results  <span id="loading" style="visibility:hidden"><img   src="img/loading2.gif" /></span></h3></div>
+         <div id="results" ></div>
+         
+      </div>
+
+      <div class="panel panel-info">
+        <div class="panel-heading"><h3>The Map</h3></div>
+          <div id="map" ></div>
+      </div>
+
 
     </div> 
 
@@ -469,7 +411,8 @@
 		L.tileLayer('http://{s}.tile.cloudmade.com/{key}/22677/256/{z}/{x}/{y}.png', {
 			attribution: 'Map data &copy; 2011 OpenStreetMap contributors, Imagery &copy; 2012 CloudMade',
 			key: 'BC9A493B41014CAABB98F0471D759707'
-		}).addTo(map);
+		}).addTo(map);
+
     </script>
     <script type="text/javascript" src="js/bootstrap-transition.js"></script>
     <script type="text/javascript" src="js/bootstrap-alert.js"></script>
