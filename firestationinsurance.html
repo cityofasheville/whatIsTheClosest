@@ -33,7 +33,7 @@
 
 
    function UpdateResults(jd,idStr){
-         $('#results').append('The address&nbsp;<span  class="text-success" ><strong>' + jd.candidates[0].address + '</strong></span>');
+         $('#results').append('<span  class="text-success" ><strong>' + jd.candidates[0].address + '</strong></span>');
    }
     
    function getLatLong(jd){
@@ -331,7 +331,7 @@
                 break;
         };
         
-        clMsg='&nbsp;Is Closest to&nbsp;'
+        clMsg='<strong>&nbsp;Is Closest to&nbsp;</strong>'
         destMsg = data.routes.features[0].attributes.Name.replace('Location 1 - ','');
         
         $('#results').append(clMsg);
@@ -379,17 +379,21 @@
           <label class="text-info" for="Button2"> or </label>
           <button type="submit" class="btn btn-primary btn-sm"  id="Button2"  onclick="getAddress('ClosestHydrant','feet')">Fire Hydrant</button>
         </fieldset>
-      </div>
+     <!-- </div>
 
-      <div class="panel panel-primary">
+      <div class="panel panel-primary"> 
         <div class="panel-heading text-info">
-          <h3>The Results  
+          <h3  class="text-info" >Closest to:-->
+           
+        <!--   </h3>
+        </div>-->
+        <br/>
+        <div  class="panel text-info" id="resultsholder" >
+            <span id="results"></span>
             <span id="loading" class="text-info" style="visibility:hidden">
               <img   src="img/loading.gif" />
             </span>
-          </h3>
         </div>
-        <div  class="panel text-info" id="results" ></div>
         <div  class="panel" id="map" ></div>
       </div>
 
