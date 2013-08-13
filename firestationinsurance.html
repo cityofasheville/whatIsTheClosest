@@ -33,7 +33,7 @@
 
 
    function UpdateResults(jd,idStr){
-         $('#results').append('<span  class="text-success" ><strong>' + jd.candidates[0].address + '</strong></span>');
+             $('#results').append('<span  class="text-success" ><strong>' + jd.candidates[0].address + '</strong></span>'); 
    }
     
    function getLatLong(jd){
@@ -50,7 +50,7 @@
            jsonpCallback: 'MyJSONPCallback', // specify the callback name if you're hard-coding it
            jsonp : "callback",
            success:function(data){zoomMap(data);},
-           error:function(data){}//console.log('ajax failed');}
+           error:function(data){updateResultsFail('Error with transforming to WGS84!');}//console.log('ajax failed');}
        });
        	   
    }
@@ -82,7 +82,7 @@
            jsonpCallback: 'MyJSONPCallback', // specify the callback name if you're hard-coding it
            jsonp : "callback",
            success:function(data){getResults(data,closestType,distance);},
-           error:function(data){}//console.log('ajax failed');}
+           error:function(data){updateResultsFail('Failed to get address!');}//console.log('ajax failed');}
        });
     }
    
@@ -222,7 +222,7 @@
                    jsonpCallback: 'MyJSONPCallback', // specify the callback name if you're hard-coding it
                    jsonp : "callback",
                    success:function(data){makeFacilityList(data,jd,closestType,distance);},
-                   error:function(data){}//console.log('ajax failed1');$('#loading').css('visibility','hidden');}
+                   error:function(data){updateResultsFail('Failed to find facilities for '+closestType+'!');}//console.log('ajax failed1');$('#loading').css('visibility','hidden');}
         		   
                });        
         
@@ -259,18 +259,26 @@
            jsonpCallback: 'MyJSONPCallback', // specify the callback name if you're hard-coding it
            jsonp : "callback",
            success:function(data){dispResults(data,distance,closestType);},
-           error:function(data){}//console.log('ajax failed1');$('#loading').css('visibility','hidden');}
+           error:function(data){updateResultsFail('Failed to get closeset facility!');}//console.log('ajax failed1');$('#loading').css('visibility','hidden');}
 		   
        });
        
    }//getClosest
    
     
-   
+    var updateResultsFail = function(amsg){
+      $('#loading').css('visibility','hidden');
+      $('#results').append('<span  class="text-danger" ><strong>' + amsg + '</strong></span>');
+        
+    }//getResults  
    var getResults = function(data,closestType,distance){
         //console.log('ajax success');
-        UpdateResults(data);
-        getFacilities(data,closestType,distance)
+        if(data.candidates.length==0){
+          updateResultsFail('No matching addresses!');
+        }else{
+          UpdateResults(data);
+          getFacilities(data,closestType,distance)
+        }
         //getLatLong(data);
         return data;
         
