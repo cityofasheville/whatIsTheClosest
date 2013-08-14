@@ -12,12 +12,12 @@ Returns a map and inforamtion about the closest item along with distance.
 ###Required###
 * ArcGIS server 10+  rest api 
 	* network anlyst extension
-	* A map service with networking enabled.  This means you will have to build a network in ArcGIS. 
-	* Cosest facility Problem map service
+	* A map service with networking enabled.  
+		* This means you will have to build a network in ArcGIS. 
+	* Cosest facility Problem must exist in a map service
 * Leaflet
 * Jquery
 * Twiiter Bootstrap
-
 
 
 ###Open the index.html file find the lines:###
