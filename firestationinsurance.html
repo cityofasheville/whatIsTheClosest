@@ -74,7 +74,7 @@
        $('#loading').css('visibility','visible')
        addressStr = $('#address').val();
        ZipStr = $('#zone').val();
-       var urlStr = 'http://'+agsServerGeocode+'/'+agsServerInstanceNameGeocodee+'/rest/services/Buncombe_Streets_With_Zip/GeocodeServer/findAddressCandidates';
+       var urlStr = 'http://'+agsServerGeocode+'/'+agsServerInstanceNameGeocode+'/rest/services/Buncombe_Streets_With_Zip/GeocodeServer/findAddressCandidates';
        var data={f:"json",Street:addressStr,Zone:ZipStr};
 
        $.ajax({
