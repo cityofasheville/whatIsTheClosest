@@ -31,6 +31,13 @@
     <script type="text/javascript" src="js/bootstrap.js"></script>
     <script type="text/javascript" language="javascript">
 
+      //This is for netorking
+      var agsServerNetwork='coa-gis-imagery'
+      var agsServerInstanceNameNetwork='COA_Internal_ArcGIS'
+    
+      //This is for geocoding
+      var agsServerGeocode='gis.ashevillenc.gov'
+      var agsServerInstanceNameGeocode='COA_ArcGIS_Server'
 
     function UpdateResults(jd,idStr){
       $('#results').append('<span  class="text-success" ><strong>' + jd.candidates[0].address + '</strong></span>');
@@ -39,7 +46,7 @@
     function getLatLong(jd){
       xStr=jd.candidates[0].location.x;
       yStr=jd.candidates[0].location.y;
-      var urlStr = 'http://coa-gis-imagery/COA_Internal_ArcGIS/rest/services/Geometry/GeometryServer/project';
+      var urlStr = 'http://'+agsServerNetwork+'/'+agsServerInstanceNameNetwork+'/rest/services/Geometry/GeometryServer/project';
       var aPt='{"x":'+xStr+',"y":'+yStr+'}';
 
       var data={f:"json",inSR:2264,outSR:4326,geometries:aPt};
@@ -67,7 +74,7 @@
        $('#loading').css('visibility','visible')
        addressStr = $('#address').val();
        ZipStr = $('#zone').val();
-       var urlStr = 'http://gis.ashevillenc.gov/COA_ArcGIS_Server/rest/services/Buncombe_Streets_With_Zip/GeocodeServer/findAddressCandidates';
+       var urlStr = 'http://'+agsServerGeocode+'/'+agsServerInstanceNameGeocodee+'/rest/services/Buncombe_Streets_With_Zip/GeocodeServer/findAddressCandidates';
        var data={f:"json",Street:addressStr,Zone:ZipStr};
 
        $.ajax({
@@ -181,7 +188,7 @@
     }//makeFacilityEnvelope
     
     function getFacilities(jd,closestType,distance){
-      var mainURL = 'http://coa-gis-imagery/COA_Internal_ArcGIS/rest/services/Publish/test_route/MapServer/';
+      var mainURL = 'http://'+agsServerNetwork+'/'+agsServerInstanceNameNetwork+'/rest/services/Publish/test_route/MapServer/';
       switch(closestType){
         case 'ClosestFireStation':
           facEnv=makeFacilityEnvelope(jd,15000);
@@ -220,7 +227,7 @@
        xStr=jd.candidates[0].location.x;
        yStr=jd.candidates[0].location.y;
 	   
-	     var urlStr = 'http://coa-gis-imagery/COA_Internal_ArcGIS/rest/services/Publish/test_route/NAServer/'+closestType+
+	     var urlStr = 'http://'+agsServerNetwork+'/'+agsServerInstanceNameNetwork+'/rest/services/Publish/test_route/NAServer/'+closestType+
 	                '/solveClosestFacility';
        var data = {f:"json",outSR:4326,returnFacilities:false,returnIncidents:false,incidents:xStr+','+yStr,facilities:fac};      
       
