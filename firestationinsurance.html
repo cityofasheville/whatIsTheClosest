@@ -11,7 +11,7 @@
     <link href="css/bootstrap.css" rel="stylesheet">
     <style type="text/css">
       body {
-        padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
+        padding-top: 5px; /* 60px to make the container go all the way to the bottom of the topbar */
       }
     </style>
 
@@ -32,62 +32,55 @@
     <script type="text/javascript" language="javascript">
 
 
-   function UpdateResults(jd,idStr){
-         $('#results').append('<span  class="text-success" ><strong>' + jd.candidates[0].address + '</strong></span>');
-   }
-    
-   function getLatLong(jd){
-	   xStr=jd.candidates[0].location.x;
-	   yStr=jd.candidates[0].location.y;
-       
-       var urlStr = 'http://coa-gis-imagery/COA_Internal_ArcGIS/rest/services/Geometry/GeometryServer/'+
-                    'project?inSR=2264&outSR=4326&geometries='+xStr+'%2C'+yStr+'6&f=pjson';
-                            
+    function UpdateResults(jd,idStr){
+      $('#results').append('<span  class="text-success" ><strong>' + jd.candidates[0].address + '</strong></span>');
+    }
+
+    function getLatLong(jd){
+      xStr=jd.candidates[0].location.x;
+      yStr=jd.candidates[0].location.y;
+      var urlStr = 'http://coa-gis-imagery/COA_Internal_ArcGIS/rest/services/Geometry/GeometryServer/project';
+      var aPt='{"x":'+xStr+',"y":'+yStr+'}';
+
+      var data={f:"json",inSR:2264,outSR:4326,geometries:aPt};
+
        $.ajax({
            url: urlStr,
            dataType: 'jsonp',
+           data:data,
            crossDomain: true,
-           jsonpCallback: 'MyJSONPCallback', // specify the callback name if you're hard-coding it
-           jsonp : "callback",
            success:function(data){zoomMap(data);},
-           error:function(data){}//console.log('ajax failed');}
+           error:function(data){updateResultsFail('Error with transforming to WGS84!');}
        });
-       	   
-   }
-   
-   var zoomMap = function(data){
-	   xStr=data.geometries[0].x;
-	   yStr=data.geometries[0].y;
+     }
 
-	   map.setView(new L.LatLng(yStr, xStr), 15);
-	   return '';
-	   
-   }
-   
-   function getAddress(closestType,distance){
+     var zoomMap = function(data){
+      xStr=data.geometries[0].x;
+      yStr=data.geometries[0].y;
+      map.setView(new L.LatLng(yStr, xStr), 15);
+      return '';
+    }
+
+    function getAddress(closestType,distance){
        clearMap();
        $('#results').html('');
        $('#loading').css('visibility','visible')
        addressStr = $('#address').val();
        ZipStr = $('#zone').val();
-       var urlStr =  'http://gis.ashevillenc.gov/COA_ArcGIS_Server/rest/services/'+
-                      'Buncombe_Streets_With_Zip/GeocodeServer/'+
-                      'findAddressCandidates?Street='+addressStr+
-                      '&Zone='+ZipStr+'&outFields=&f=pjson';
-       
+       var urlStr = 'http://gis.ashevillenc.gov/COA_ArcGIS_Server/rest/services/Buncombe_Streets_With_Zip/GeocodeServer/findAddressCandidates';
+       var data={f:"json",Street:addressStr,Zone:ZipStr};
+
        $.ajax({
            url: urlStr,
            dataType: 'jsonp',
+           data:data,
            crossDomain: true,
-           jsonpCallback: 'MyJSONPCallback', // specify the callback name if you're hard-coding it
-           jsonp : "callback",
            success:function(data){getResults(data,closestType,distance);},
-           error:function(data){}//console.log('ajax failed');}
+           error:function(data){updateResultsFail('Failed to get address!');}//console.log('ajax failed');}
        });
-    }
-   
+     }
 
-    function drawRoute(data){
+     function drawRoute(data){
        var geojsonGroup = new L.LayerGroup();
        
        var path=data.routes.features[0].geometry.paths[0]
@@ -166,7 +159,7 @@
                     map.removeLayer(map._layers[i]);
                 }
                 catch(e) {
-                    //console.log("problem with " + e + map._layers[i]);
+                    //do nothing....
                 }
             }
         }
@@ -176,55 +169,46 @@
 	   xStr=jd.candidates[0].location.x;
 	   yStr=jd.candidates[0].location.y;
 	   
-	   maxX=parseFloat(xStr)+parseFloat(distance);
-	   maxY=parseFloat(yStr)+parseFloat(distance);
+	   maxX=parseFloat(parseFloat(xStr)+parseFloat(distance));
+	   maxY=parseFloat(parseFloat(yStr)+parseFloat(distance));
 
-	   minX=parseFloat(xStr)-parseFloat(distance);
-	   minY=parseFloat(yStr)-parseFloat(distance);
+	   minX=parseFloat(parseFloat(xStr)-parseFloat(distance));
+	   minY=parseFloat(parseFloat(yStr)-parseFloat(distance));
 	   
-	   retVal=maxX+','+maxY+','+minX+','+minY;
-	   
+	   retVal='{"xmin":'+minX+',"ymin":'+minY+',"xmax":'+maxX+',"ymax":'+maxY+',"spatialReference":{"wkid":2264}}';
+     
 	   return retVal;
-	   
-	   
     }//makeFacilityEnvelope
     
     function getFacilities(jd,closestType,distance){
-       
-
-       switch(closestType)
-            {
-            case 'ClosestFireStation':
-                facEnv=makeFacilityEnvelope(jd,10000);
-                var urlStr = 'http://coa-gis-imagery/COA_Internal_ArcGIS/rest/services/Publish/test_route/MapServer/1/query?text=&geometry='+facEnv+
-                             '&geometryType=esriGeometryEnvelope&inSR=2264&spatialRel=esriSpatialRelEnvelopeIntersects&relationParam=&objectIds=&where=&time='+
-                             '&returnIdsOnly=false&returnGeometry=true&maxAllowableOffset=&outSR=2264&outFields=label&f=pjson';              
-                break;
-            case 'ClosestHydrant':
-                facEnv=makeFacilityEnvelope(jd,500);
-                var urlStr = 'http://coa-gis-imagery/COA_Internal_ArcGIS/rest/services/Publish/test_route/MapServer/0/query?text=&geometry='+facEnv+
-                             '&geometryType=esriGeometryEnvelope&inSR=2264&spatialRel=esriSpatialRelEnvelopeIntersects&relationParam=&objectIds=&where=&time='+
-                             '&returnIdsOnly=false&returnGeometry=true&maxAllowableOffset=&outSR=2264&outFields=facilityid&f=pjson';              
-                 break;
-            default:  
-                facEnv=makeFacilityEnvelope(jd,10000);
-                var urlStr = 'http://coa-gis-imagery/COA_Internal_ArcGIS/rest/services/Publish/test_route/MapServer/1/query?text=&geometry='+facEnv+
-                             '&geometryType=esriGeometryEnvelope&inSR=2264&spatialRel=esriSpatialRelEnvelopeIntersects&relationParam=&objectIds=&where=&time='+
-                             '&returnIdsOnly=false&returnGeometry=true&maxAllowableOffset=&outSR=2264&outFields=label&f=pjson';              
-                break;
-            }//switch        
-           
-
-         $.ajax({
-                   url: urlStr,
-                   dataType: 'jsonp',
-                   crossDomain: true,
-                   jsonpCallback: 'MyJSONPCallback', // specify the callback name if you're hard-coding it
-                   jsonp : "callback",
-                   success:function(data){makeFacilityList(data,jd,closestType,distance);},
-                   error:function(data){}//console.log('ajax failed1');$('#loading').css('visibility','hidden');}
-        		   
-               });        
+      var mainURL = 'http://coa-gis-imagery/COA_Internal_ArcGIS/rest/services/Publish/test_route/MapServer/';
+      switch(closestType){
+        case 'ClosestFireStation':
+          facEnv=makeFacilityEnvelope(jd,15000);
+          var urlStr = mainURL+'1/query';
+          var data ={f:"json",outSR:2264,inSR:2264,geometry:facEnv,geometryType:"esriGeometryEnvelope",spatialRel:"esriSpatialRelEnvelopeIntersects",outFields:"label"};
+          break;
+        case 'ClosestHydrant':
+          facEnv=makeFacilityEnvelope(jd,500);
+          var urlStr = mainURL+'0/query';
+          var data ={f:"json",outSR:2264,inSR:2264,geometry:facEnv,geometryType:"esriGeometryEnvelope",spatialRel:"esriSpatialRelEnvelopeIntersects",outFields:"facilityid"};
+          break;
+        default:  
+          facEnv=makeFacilityEnvelope(jd,15000);
+          var urlStr = mainURL+'1/query';
+          var data ={f:"json",outSR:2264,inSR:2264,geometry:facEnv,geometryType:"esriGeometryEnvelope",spatialRel:"esriSpatialRelEnvelopeIntersects",outFields:"label"};
+          break;
+        }//switch        
+        
+        
+        $.ajax({
+          url: urlStr,
+          dataType: 'jsonp',
+          data:data,
+          crossDomain: true,
+          success:function(data){makeFacilityList(data,jd,closestType,distance);},
+          error:function(data){updateResultsFail('Failed to find facilities for '+closestType+'!');}
+        });        
         
         return urlStr;
     }//getFacilities
@@ -233,45 +217,41 @@
          
        addressStr = $('#address').val();
        ZipStr = $('#zone').val();
-	   xStr=jd.candidates[0].location.x;
-	   yStr=jd.candidates[0].location.y;
+       xStr=jd.candidates[0].location.x;
+       yStr=jd.candidates[0].location.y;
 	   
-	   //console.log(facEnv); 
-
-	   
-	   var urlStr = 'http://coa-gis-imagery/COA_Internal_ArcGIS/rest/services/Publish/test_route/NAServer/'+closestType+
-	                '/solveClosestFacility?incidents='+xStr+'%2C'+yStr+'&facilities='+fac+'&barriers=&polylineBarriers='+
-	                '&polygonBarriers=&travelDirection=esriNATravelDirectionToFacility&defaultCutoff=&defaultTargetFacilityCount=1'+
-	                '&outSR=4326&accumulateAttributeNames=Distance&impedanceAttributeName=Distance&restrictionAttributeNames=Use+One+Way'+
-	                '&attributeParameterValues=&restrictUTurns=esriNFSBAllowBacktrack&useHierarchy=true&returnDirections=true&'+
-	                'returnCFRoutes=true&returnFacilities=false&returnIncidents=false&returnBarriers=false&returnPolylineBarriers=false'+
-	                '&returnPolygonBarriers=false&directionsLanguage=en-US&directionsStyleName=NA+Desktop&outputLines=esriNAOutputLineTrueShape'+
-	                '&outputGeometryPrecision=&outputGeometryPrecisionUnits=esriUnknownUnits&directionsTimeAttributeName=Drive+Time'+
-	                '&directionsLengthUnits=esriNAUMiles&f=pjson';
-       var pt = '';
-       var retVal;
-       
+	     var urlStr = 'http://coa-gis-imagery/COA_Internal_ArcGIS/rest/services/Publish/test_route/NAServer/'+closestType+
+	                '/solveClosestFacility';
+       var data = {f:"json",outSR:4326,returnFacilities:false,returnIncidents:false,incidents:xStr+','+yStr,facilities:fac};      
       
        $.ajax({
            url: urlStr,
            dataType: 'jsonp',
+           data:data,
            crossDomain: true,
-           jsonpCallback: 'MyJSONPCallback', // specify the callback name if you're hard-coding it
-           jsonp : "callback",
            success:function(data){dispResults(data,distance,closestType);},
-           error:function(data){}//console.log('ajax failed1');$('#loading').css('visibility','hidden');}
+           error:function(data){updateResultsFail('Failed to get closeset facility!');}
 		   
        });
        
    }//getClosest
    
     
-   
+    var updateResultsFail = function(amsg){
+      $('#loading').css('visibility','hidden');
+      $('#results').append('<span  class="text-danger" ><strong>' + amsg + '</strong></span>');
+        
+    }//updateResultsFail
+
    var getResults = function(data,closestType,distance){
-        //console.log('ajax success');
-        UpdateResults(data);
-        getFacilities(data,closestType,distance)
-        //getLatLong(data);
+        
+        if(data.candidates.length==0){
+          updateResultsFail('No matching addresses!');
+        }else{
+          UpdateResults(data);
+          getFacilities(data,closestType,distance)
+        }
+        
         return data;
         
     }//getResults
@@ -296,14 +276,12 @@
        }
         theFacs=theFacs.substring(0, theFacs.length-1); 
         theFacs=theFacs+']}';
-        //console.log(theFacs);
         getClosest(jd,theFacs,closestType,distance);
         
     }//makeFacilityList
+
     var dispResults = function(data,distance,closestType){
-        //console.log(distance);
         $('#loading').css('visibility','hidden');
-        
         switch(distance){
             case 'feet':
                 distTemp = parseFloat( data.routes.features[0].attributes.Total_Distance.toFixed(2) ).toFixed(2);
@@ -340,13 +318,12 @@
         
            
         drawRoute(data)
-    }   
-	function onEachFeature() {
-		var popupContent = "<p>test!</p>";
-	    layer.bindPopup(popupContent);
-	}
+    }
+    function onEachFeature() {
+      var popupContent = "<p>test!</p>";
+      layer.bindPopup(popupContent);
+    }
 	 
-
 
    </script>
   
@@ -356,25 +333,36 @@
           }
   </style>
 
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
+    ga('create', 'UA-43089083-1', 'cityofasheville.github.io');
+    ga('send', 'pageview');
+
+  </script>
   </head>
 
 
   <body data-twttr-rendered="true" background-color="#F0F0F0">
     <div class="container bs-docs-container">
+
+
+
       <div class="panel panel-primary">
-        <div class="panel-heading"><h2>What's The Closest?</h2></div>
-        <fieldset>
-          <div class="form-group">
-            <label class="text-info" for="address">Enter the Address</label>
-            <input type="text" class="form-control text-primary" id="address" placeholder="70 court pz"  value="70 court pz">
-          </div>
-          <div class="form-group">
-            <label class="text-info" for="zone">Enter the Zip Code</label>
-            <input type="text" class="form-control text-primary" id="zone" placeholder="28801"  value="28801">
-          </div>
+        <!--<div class="panel-heading"><h2>What's The Closest?</h2></div>-->
+        <legend class="text-info"><h2>What's The Closest?</h2></legend>
+        <fieldset>          
+          <label class="text-info" for="address">Enter the Address</label>
+          <input type="text" class="form-control" id="address" placeholder="70 court pz"  value="70 court pz">
+          <br />
+          <label class="text-info" for="zone">Enter the Zip Code</label>
+          <input type="text" class="form-control" id="zone" placeholder="28801"  value="28801">     
+          <br />
           <label class="text-info" for="Button1">Click to find the closest </label>
-          <br/>
+           <br/>
           <button type="submit" class="btn btn-primary btn-sm"  id="Button1"  onclick="getAddress('ClosestFireStation','miles')">Fire Station</button>
           <label class="text-info" for="Button2"> or </label>
           <button type="submit" class="btn btn-primary btn-sm"  id="Button2"  onclick="getAddress('ClosestHydrant','feet')">Fire Hydrant</button>
