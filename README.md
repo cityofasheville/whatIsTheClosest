@@ -27,6 +27,7 @@ Returns a map and information about the closest item along with distance.
 		//This is for netorking
 		var agsServerNetwork='coa-gis-imagery'; //ArcGIS  server name for networking
 		var agsServerInstanceNameNetwork='COA_Internal_ArcGIS'; //ArcGIS  server instance for networking
+		
 		//hyrdrants
 		var HydrantLayerIDX='0'; //layer index  for hydrants
 		var HydrantNameField='facilityid'; //Field for name in hydrant layer
