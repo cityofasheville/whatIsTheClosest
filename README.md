@@ -21,8 +21,8 @@ Returns a map and inforamtion about the closest item along with distance.
 
 
 ###Open the index.html file find the lines:###
-   //setup 
-   * Change the following to match your ArcGIS server setup
+   
+   Change the following to match your ArcGIS server setup
       //This is for netorking      
       var agsServerNetwork='coa-gis-imagery'; //arcgis server name for networking
       var agsServerInstanceNameNetwork='COA_Internal_ArcGIS'; //arcgis server instance for networking
