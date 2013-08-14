@@ -15,12 +15,6 @@
       }
     </style>
 
-    <!-- Fav and touch icons -->
-    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="ico/apple-touch-icon-144-precomposed.png"/>
-    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="ico/apple-touch-icon-114-precomposed.png"/>
-    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="ico/apple-touch-icon-72-precomposed.png"/>
-    <link rel="apple-touch-icon-precomposed" href="ico/apple-touch-icon-57-precomposed.png"/>
-    <link rel="shortcut icon" href="ico/favicon.png"/>
     <script type="text/javascript" src="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.js"></script>
     <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.css" />
     <!--[if lte IE 8]>
@@ -31,18 +25,41 @@
     <script type="text/javascript" src="js/bootstrap.js"></script>
     <script type="text/javascript" language="javascript">
 
+      //setup 
+      //This is for netorking
+      var agsServerNetwork='coa-gis-imagery'; //ArcGIS  server name for networking
+      var agsServerInstanceNameNetwork='COA_Internal_ArcGIS'; //ArcGIS  server instance for networking
 
-    function UpdateResults(jd,idStr){
-      $('#results').append('<span  class="text-success" ><strong>' + jd.candidates[0].address + '</strong></span>');
+      //hyrdrants
+      var HydrantLayerIDX='0'; //layer index  for hydrants
+      var HydrantNameField='facilityid'; //Field for name in hydrant layer
+      var HydrantDistance=500; //Distance  to get hydrants around address this helps with performance
+
+      //Fire stations
+      var FireStationIDX='1'; //layer index  for fire stations
+      var FireStationNameField='label'; //Field for name in fire station layer
+      var FireStationDistance=15000; //Distance  to get fire stations around address  this helps with performance
+      var RoutingServiceName='test_route'; //name of the map service containing  network and the closest facility problem
+       
+
+      //This is for geocoding
+      var agsServerGeocode='gis.ashevillenc.gov'; //ArcGIS  server name for geocoding
+      var agsServerInstanceNameGeocode='COA_ArcGIS_Server'; //ArcGIS  server instance for geocoding
+      var geocdingLayerName='Buncombe_Streets_With_Zip'; //geocoding service to use.
+
+      var mySRID=2264 //your projection id
+
+    function UpdateResults(someData,idStr){
+      $('#results').append('<span  class="text-success" ><strong>' + someData.candidates[0].address + '</strong></span>');
     }
 
-    function getLatLong(jd){
-      xStr=jd.candidates[0].location.x;
-      yStr=jd.candidates[0].location.y;
-      var urlStr = 'http://coa-gis-imagery/COA_Internal_ArcGIS/rest/services/Geometry/GeometryServer/project';
+    function getLatLong(someData){
+      xStr=someData.candidates[0].location.x;
+      yStr=someData.candidates[0].location.y;
+      var urlStr = 'http://'+agsServerNetwork+'/'+agsServerInstanceNameNetwork+'/rest/services/Geometry/GeometryServer/project';
       var aPt='{"x":'+xStr+',"y":'+yStr+'}';
 
-      var data={f:"json",inSR:2264,outSR:4326,geometries:aPt};
+      var data={f:"json",inSR:mySRID,outSR:4326,geometries:aPt};
 
        $.ajax({
            url: urlStr,
@@ -67,7 +84,7 @@
        $('#loading').css('visibility','visible')
        addressStr = $('#address').val();
        ZipStr = $('#zone').val();
-       var urlStr = 'http://gis.ashevillenc.gov/COA_ArcGIS_Server/rest/services/Buncombe_Streets_With_Zip/GeocodeServer/findAddressCandidates';
+       var urlStr = 'http://'+agsServerGeocode+'/'+agsServerInstanceNameGeocode+'/rest/services/'+geocdingLayerName+'/GeocodeServer/findAddressCandidates';
        var data={f:"json",Street:addressStr,Zone:ZipStr};
 
        $.ajax({
@@ -165,9 +182,9 @@
         }
     }
         
-    function makeFacilityEnvelope(jd,distance){
-	   xStr=jd.candidates[0].location.x;
-	   yStr=jd.candidates[0].location.y;
+    function makeFacilityEnvelope(someData,distance){
+	   xStr=someData.candidates[0].location.x;
+	   yStr=someData.candidates[0].location.y;
 	   
 	   maxX=parseFloat(parseFloat(xStr)+parseFloat(distance));
 	   maxY=parseFloat(parseFloat(yStr)+parseFloat(distance));
@@ -175,28 +192,41 @@
 	   minX=parseFloat(parseFloat(xStr)-parseFloat(distance));
 	   minY=parseFloat(parseFloat(yStr)-parseFloat(distance));
 	   
-	   retVal='{"xmin":'+minX+',"ymin":'+minY+',"xmax":'+maxX+',"ymax":'+maxY+',"spatialReference":{"wkid":2264}}';
+	   retVal='{"xmin":'+minX+',"ymin":'+minY+',"xmax":'+maxX+',"ymax":'+maxY+',"spatialReference":{"wkid":'+mySRID+'}}';
      
 	   return retVal;
     }//makeFacilityEnvelope
     
-    function getFacilities(jd,closestType,distance){
-      var mainURL = 'http://coa-gis-imagery/COA_Internal_ArcGIS/rest/services/Publish/test_route/MapServer/';
+    function getFacilities(someData,closestType,distance){
+      var mainURL = 'http://'+agsServerNetwork+'/'+agsServerInstanceNameNetwork+'/rest/services/Publish/'+RoutingServiceName+'/MapServer/';
+
       switch(closestType){
         case 'ClosestFireStation':
-          facEnv=makeFacilityEnvelope(jd,15000);
-          var urlStr = mainURL+'1/query';
-          var data ={f:"json",outSR:2264,inSR:2264,geometry:facEnv,geometryType:"esriGeometryEnvelope",spatialRel:"esriSpatialRelEnvelopeIntersects",outFields:"label"};
+          facEnv=makeFacilityEnvelope(someData,FireStationDistance);
+          var urlStr = mainURL+FireStationIDX+'/query';
+          var jobj = {f:"json",outSR:mySRID,inSR:mySRID,geometry:facEnv,geometryType:"esriGeometryEnvelope",spatialRel:"esriSpatialRelEnvelopeIntersects",outFields:"replacenamefield"};
+          var jsonstr = JSON.stringify(jobj);
+          jsonstr = jsonstr.replace("replacenamefield",FireStationNameField);
+          jobj = $.parseJSON(jsonstr, true);          
+          var data = jobj;
           break;
         case 'ClosestHydrant':
-          facEnv=makeFacilityEnvelope(jd,500);
-          var urlStr = mainURL+'0/query';
-          var data ={f:"json",outSR:2264,inSR:2264,geometry:facEnv,geometryType:"esriGeometryEnvelope",spatialRel:"esriSpatialRelEnvelopeIntersects",outFields:"facilityid"};
+          facEnv=makeFacilityEnvelope(someData,HydrantDistance);
+          var urlStr = mainURL+HydrantLayerIDX+'/query';          
+          var jobj = {f:"json",outSR:mySRID,inSR:mySRID,geometry:facEnv,geometryType:"esriGeometryEnvelope",spatialRel:"esriSpatialRelEnvelopeIntersects",outFields:"replacenamefield"};
+          var jsonstr = JSON.stringify(jobj);
+          jsonstr = jsonstr.replace("replacenamefield",HydrantNameField);
+          jobj = $.parseJSON(jsonstr, true);          
+          var data = jobj;
           break;
         default:  
-          facEnv=makeFacilityEnvelope(jd,15000);
-          var urlStr = mainURL+'1/query';
-          var data ={f:"json",outSR:2264,inSR:2264,geometry:facEnv,geometryType:"esriGeometryEnvelope",spatialRel:"esriSpatialRelEnvelopeIntersects",outFields:"label"};
+          facEnv=makeFacilityEnvelope(someData,FireStationDistance);
+          var urlStr = mainURL+FireStationIDX+'/query';
+          var jobj = {f:"json",outSR:mySRID,inSR:mySRID,geometry:facEnv,geometryType:"esriGeometryEnvelope",spatialRel:"esriSpatialRelEnvelopeIntersects",outFields:"replacenamefield"};
+          var jsonstr = JSON.stringify(jobj);
+          jsonstr = jsonstr.replace("replacenamefield",FireStationNameField);
+          jobj = $.parseJSON(jsonstr, true);          
+          var data = jobj;
           break;
         }//switch        
         
@@ -206,22 +236,21 @@
           dataType: 'jsonp',
           data:data,
           crossDomain: true,
-          success:function(data){makeFacilityList(data,jd,closestType,distance);},
+          success:function(data){makeFacilityList(data,someData,closestType,distance);},
           error:function(data){updateResultsFail('Failed to find facilities for '+closestType+'!');}
         });        
         
         return urlStr;
     }//getFacilities
     
-    function getClosest(jd,fac,closestType,distance){
+    function getClosest(someData,fac,closestType,distance){
          
        addressStr = $('#address').val();
        ZipStr = $('#zone').val();
-       xStr=jd.candidates[0].location.x;
-       yStr=jd.candidates[0].location.y;
+       xStr=someData.candidates[0].location.x;
+       yStr=someData.candidates[0].location.y;
 	   
-	     var urlStr = 'http://coa-gis-imagery/COA_Internal_ArcGIS/rest/services/Publish/test_route/NAServer/'+closestType+
-	                '/solveClosestFacility';
+	     var urlStr = 'http://'+agsServerNetwork+'/'+agsServerInstanceNameNetwork+'/rest/services/Publish/'+RoutingServiceName+'/NAServer/'+closestType+'/solveClosestFacility';
        var data = {f:"json",outSR:4326,returnFacilities:false,returnIncidents:false,incidents:xStr+','+yStr,facilities:fac};      
       
        $.ajax({
@@ -256,7 +285,7 @@
         
     }//getResults
        
-    var makeFacilityList = function(data,jd,closestType,distance){
+    var makeFacilityList = function(data,someData,closestType,distance){
         theFacs='{"features":[';
 
         for(var i=0;i< data.features.length;i++){
@@ -276,7 +305,7 @@
        }
         theFacs=theFacs.substring(0, theFacs.length-1); 
         theFacs=theFacs+']}';
-        getClosest(jd,theFacs,closestType,distance);
+        getClosest(someData,theFacs,closestType,distance);
         
     }//makeFacilityList
 
