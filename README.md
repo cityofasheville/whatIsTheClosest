@@ -17,7 +17,6 @@ My example uses hydrants and Fire stations and returns a map, the name of the cl
 	* Cosest facility Problem must exist in a map service
 * Leaflet
 * Jquery
-* Twiiter Bootstrap
 
 
 ###Open the index.html file find the lines:###
