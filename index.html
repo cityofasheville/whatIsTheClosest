@@ -2,534 +2,447 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>Bootstrap, from Twitter</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fire Station Insurance COA</title>
+    <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
     <meta name="description" content="">
     <meta name="author" content="">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <!-- Le styles -->
     <link href="css/bootstrap.css" rel="stylesheet">
-    <style>
+    <style type="text/css">
       body {
-        padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
+        padding-top: 5px; /* 60px to make the container go all the way to the bottom of the topbar */
       }
     </style>
-    <link href="css/bootstrap-responsive.css" rel="stylesheet">
-
-    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
-    <!--[if lt IE 9]>
-      <script src="js/html5shiv.js"></script>
-    <![endif]-->
 
     <!-- Fav and touch icons -->
-    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="ico/apple-touch-icon-144-precomposed.png">
-    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="ico/apple-touch-icon-114-precomposed.png">
-    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="ico/apple-touch-icon-72-precomposed.png">
-    <link rel="apple-touch-icon-precomposed" href="ico/apple-touch-icon-57-precomposed.png">
-    <link rel="shortcut icon" href="ico/favicon.png">
-    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.5/leaflet.css" />
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="ico/apple-touch-icon-144-precomposed.png"/>
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="ico/apple-touch-icon-114-precomposed.png"/>
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="ico/apple-touch-icon-72-precomposed.png"/>
+    <link rel="apple-touch-icon-precomposed" href="ico/apple-touch-icon-57-precomposed.png"/>
+    <link rel="shortcut icon" href="ico/favicon.png"/>
+    <script type="text/javascript" src="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.js"></script>
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.css" />
     <!--[if lte IE 8]>
-         <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.5/leaflet.ie.css" />
-    <![endif]-->
-     <script type="text/javascript" src="http://cdn.leafletjs.com/leaflet-0.5/leaflet.js"></script>
-    <!-- <style type="text/javascript">#map { height: 180px; }</style> -->
+     <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.ie.css" />
+    <![endif]-->    <!-- <style type="text/javascript">#map { height: 180px; }</style> -->
 
-  <link rel="stylesheet" href="http://serverapi.arcgisonline.com/jsapi/arcgis/3.5/js/dojo/dijit/themes/claro/claro.css">
-  <link rel="stylesheet" href="http://serverapi.arcgisonline.com/jsapi/arcgis/3.5/js/esri/css/esri.css">
-  <link rel="stylesheet" href="http://serverapi.arcgisonline.com/jsapi/arcgis/3.5/js/dojo/dojox/layout/resources/FloatingPane.css">
-  
-  <style> 
-    body,html,#main{margin:0;padding:0;height:100%;width:100%;}
-    .panel {
-    -moz-border-radius: 6px;
-    -webkit-border-radius: 6px;
-    -moz-box-shadow: 0px 6px 3px -3px #888;
-    -webkit-box-shadow: 0px 6px 3px -3px #888;
-    box-shadow: 0px 6px 3px -3px #888;
-    border: 2px solid #86942A;
-    margin: 5px;5px;5px;5px;
-  }
-  </style> 
-  
-   <script type="text/javascript" >var dojoConfig = { parseOnLoad:true };</script> 
-   <script type="text/javascript" src="http://serverapi.arcgisonline.com/jsapi/arcgis/3.5/"></script>
+    <script type="text/javascript" src="js/jquery.js"></script>
+    <script type="text/javascript" src="js/bootstrap.js"></script>
+    <script type="text/javascript" language="javascript">
 
 
-
-  <script type="text/javascript" >
-    dojo.require("esri.map");  
-    dojo.require("esri.tasks.locator");
-    dojo.require("dojo.number");
-    dojo.require("esri.tasks.closestfacility");
-    dojo.require("dijit.dijit");
-    dojo.require("dijit.form.ComboBox");
-    dojo.require("dijit.form.Textarea");
-    dojo.require("dijit.layout.BorderContainer");
-    dojo.require("dijit.layout.ContentPane");
+   function UpdateResults(jd,idStr){
+             $('#results').append('<span  class="text-success" ><strong>' + jd.candidates[0].address + '</strong></span>'); 
+   }
     
-    var map, incidentsGraphicsLayer, routeGraphicLayer;
-    var closestFacilityTask, params;
-
-
-                
-      function init() {
-        map = new esri.Map("mapdj", { 
-          sliderOrientation: "horizontal"
-        });
-
-        var imageParameters = new esri.layers.ImageParameters();
-        imageParameters.format = "jpeg";  //set the image type to PNG24, note default is PNG8.
-
-        //Takes a URL to a non cached map service.
-        var dynamicMapServiceLayer = new esri.layers.ArcGISDynamicMapServiceLayer("http://gis.ashevillenc.gov/COA_ArcGIS_Server/rest/services/mapAsheville/Test_BaseMap/MapServer", {
-          "opacity":0.5, 
-          "imageParameters":imageParameters
-        });
-        
-        map.addLayer(dynamicMapServiceLayer);
-      
- 
-      
-
-      dojo.connect(map, "onClick", mapClickHandler);
-      
-      params = new esri.tasks.ClosestFacilityParameters();
-      params.defaultCutoff= 3.0;
-      params.returnIncidents=false;
-      params.returnRoutes=true;
-      params.returnDirections=true;
-      
-      dojo.connect(map, "onLoad", function(map) {
-        var facilityPointSymbol = new esri.symbol.SimpleMarkerSymbol(
-          esri.symbol.SimpleMarkerSymbol.STYLE_SQUARE, 
-          20,
-          new esri.symbol.SimpleLineSymbol(
-            esri.symbol.SimpleLineSymbol.STYLE_SOLID,
-            new dojo.Color([89,95,35]), 2
-          ),
-          new dojo.Color([130,159,83,0.40])
-        ); 
-
-        var incidentPointSymbol = new esri.symbol.SimpleMarkerSymbol(
-          esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE, 
-          16,
-          new esri.symbol.SimpleLineSymbol(
-            esri.symbol.SimpleLineSymbol.STYLE_SOLID,
-            new dojo.Color([89,95,35]), 2
-          ),
-          new dojo.Color([130,159,83,0.40])
-        );  
-
-        incidentsGraphicsLayer = new esri.layers.GraphicsLayer();
-        
-        var incidentsRenderer = new esri.renderer.SimpleRenderer(incidentPointSymbol);
-        incidentsGraphicsLayer.setRenderer(incidentsRenderer);
-        map.addLayer(incidentsGraphicsLayer);
-
-        routeGraphicLayer = new esri.layers.GraphicsLayer();
-        
-        var routePolylineSymbol = new esri.symbol.SimpleLineSymbol(
-          esri.symbol.SimpleLineSymbol.STYLE_SOLID, 
-          new dojo.Color([89,95,35]), 
-          4.0
-        );
-        var routeRenderer = new esri.renderer.SimpleRenderer(routePolylineSymbol);
-        routeGraphicLayer.setRenderer(routeRenderer);
-
-        map.addLayer(routeGraphicLayer);
-
-        //var facilitiesGraphicsLayer = new esri.layers.GraphicsLayer();
-        //var facilityRenderer = new esri.renderer.SimpleRenderer(facilityPointSymbol);
-        //facilitiesGraphicsLayer.setRenderer(facilityRenderer);
+   function getLatLong(jd){
+	   xStr=jd.candidates[0].location.x;
+	   yStr=jd.candidates[0].location.y;
        
-        //map.addLayer(facilitiesGraphicsLayer);
-        //alert(map.spatialReference.wkid)
-        //facilitiesGraphicsLayer.add(new esri.Graphic(new esri.geometry.Point(-82.5488,35.593,map.spatialReference)));
-        //facilitiesGraphicsLayer.add(new esri.Graphic(new esri.geometry.Point(942559.3131500304,690578.6353148625,map.spatialReference)));
-        //facilitiesGraphicsLayer.add(new esri.Graphic(new esri.geometry.Point(941771.9345977657,691136.1560300763,map.spatialReference)));
-        //facilitiesGraphicsLayer.add(new esri.Graphic(new esri.geometry.Point(941710.1738841726,692662.5279517361,map.spatialReference))); 
-        //facilitiesGraphicsLayer.add(new esri.Graphic(new esri.geometry.Point(943977.6743689503,690774.4147076021,map.spatialReference))); 
-        //facilitiesGraphicsLayer.add(new esri.Graphic(new esri.geometry.Point(943995.3202871197,689256.8657450271,map.spatialReference))); 
+       var urlStr = 'http://coa-gis-imagery/COA_Internal_ArcGIS/rest/services/Geometry/GeometryServer/'+
+                    'project?inSR=2264&outSR=4326&geometries='+xStr+'%2C'+yStr+'6&f=pjson';
+                            
+       $.ajax({
+           url: urlStr,
+           dataType: 'jsonp',
+           crossDomain: true,
+           jsonpCallback: 'MyJSONPCallback', // specify the callback name if you're hard-coding it
+           jsonp : "callback",
+           success:function(data){zoomMap(data);},
+           error:function(data){updateResultsFail('Error with transforming to WGS84!');}//console.log('ajax failed');}
+       });
+       	   
+   }
    
-        //var facilities = new esri.tasks.FeatureSet();
-        //facilities.features = facilitiesGraphicsLayer.graphics;
-        
-        params.facilities = '';
-        params.outSpatialReference = map.spatialReference;
+   var zoomMap = function(data){
+	   xStr=data.geometries[0].x;
+	   yStr=data.geometries[0].y;
+
+	   map.setView(new L.LatLng(yStr, xStr), 15);
+	   return '';
+	   
+   }
+   
+   function getAddress(closestType,distance){
+       clearMap();
+       $('#results').html('');
+       $('#loading').css('visibility','visible')
+       addressStr = $('#address').val();
+       ZipStr = $('#zone').val();
+       var urlStr =  'http://gis.ashevillenc.gov/COA_ArcGIS_Server/rest/services/'+
+                      'Buncombe_Streets_With_Zip/GeocodeServer/'+
+                      'findAddressCandidates?Street='+addressStr+
+                      '&Zone='+ZipStr+'&outFields=&f=pjson';
        
-       
-      });
-      closestFacilityTask = new esri.tasks.ClosestFacilityTask("http://coa-gis-imagery/COA_Internal_ArcGIS/rest/services/Publish/test_route/NAServer/ClosestFireStation");
-      closestHydrantTask = new esri.tasks.ClosestFacilityTask("http://coa-gis-imagery/COA_Internal_ArcGIS/rest/services/Publish/test_route/NAServer/ClosestHydrant");
-         
-      locator = new esri.tasks.Locator("http://gis.ashevillenc.gov/COA_ArcGIS_Server/rest/services/Buncombe_Address_Point/GeocodeServer");
-      dojo.connect(locator, "onAddressToLocationsComplete", showResults);
-                                                                
+       $.ajax({
+           url: urlStr,
+           dataType: 'jsonp',
+           crossDomain: true,
+           jsonpCallback: 'MyJSONPCallback', // specify the callback name if you're hard-coding it
+           jsonp : "callback",
+           success:function(data){getResults(data,closestType,distance);},
+           error:function(data){updateResultsFail('Failed to get address!');}//console.log('ajax failed');}
+       });
     }
-    function clearGraphics() {
-      //clear graphics
-      dojo.byId("directionsDiv").innerHTML= "";
-      map.graphics.clear();
-      routeGraphicLayer.clear();
-      incidentsGraphicsLayer.clear();    
-    } 
+   
 
-    function mapClickHandler(evt) {
-      clearGraphics();
-      dojo.byId("directionsDiv").innerHTML= "";
-      var inPoint = new esri.geometry.Point(evt.mapPoint.x,evt.mapPoint.y,map.spatialReference);
-      var location = new esri.Graphic(inPoint);
-      incidentsGraphicsLayer.add(location);
-      //prompt('',evt.mapPoint.x+'||-'+evt.mapPoint.y);
-      var features = [];
-      features.push(location);
-      var incidents = new esri.tasks.FeatureSet();
-      incidents.features = features;
-      params.incidents = incidents;
-      
-      map.graphics.enableMouseEvents();
-     
-      dojo.connect(routeGraphicLayer,"onMouseOver", function(evt){
-        //clear existing directions and highlight symbol
-        map.graphics.clear();
-        
-        dojo.byId("directionsDiv").innerHTML= "Hover over the route to view directions";
-        
-        var highlightSymbol = new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new dojo.Color([0,255,255],0.25), 4.5);
-        var highlightGraphic = new esri.Graphic(evt.graphic.geometry,highlightSymbol);
-        
-        map.graphics.add(highlightGraphic);
-        dojo.byId("directionsDiv").innerHTML = esri.substitute(evt.graphic.attributes,"${*}");
+    function drawRoute(data){
+       var geojsonGroup = new L.LayerGroup();
+       
+       var path=data.routes.features[0].geometry.paths[0]
+       var myLines = '[{"type": "LineString","coordinates":['
+       for(var i=0;i< data.routes.features[0].geometry.paths.length;i++)
+       {
+            for(var j=0;j< data.routes.features[0].geometry.paths[i].length;j++){
+                myLines += '['+data.routes.features[0].geometry.paths[i][j]+'],'
+            }
+       }
+       
+       myLines=myLines.substring(0, myLines.length-1)
+       myLines += ']}]'
+       myJsonObject=JSON.parse(myLines);
+       
+       var startPt = '[{"type": "Point","coordinates":['+data.routes.features[0].geometry.paths[0][0]+']}]';
+       var endPt = '[{"type": "Point","coordinates":['+data.routes.features[0].geometry.paths[0][(data.routes.features[0].geometry.paths[0].length-1)]+']}]'
 
-      });
+       var myStyle = {
+           "color": "#C09853",
+           "weight": 10,
+           "opacity": 0.65
+       };
 
-      //solve 
-      closestFacilityTask.solve(params,function(solveResult){
-        var directions = solveResult.directions;
-        
-        alert(solveResult.directions[0].totalLength)
-        
-        dojo.forEach(solveResult.routes, function(route, index){
-          //build an array of route info
-          
-          var attr = dojo.map(solveResult.directions[index].features,function(feature){
+       geoJSONLayer = L.geoJson(myJsonObject, {
+           style: myStyle
+       });
+       
+       var bounds = geoJSONLayer.getBounds();
+       geoJSONLayer.addTo(map);
+       drawPoints(startPt,'start');
+       drawPoints(endPt,'end');
+       map.fitBounds(bounds,100);
+       map.zoomOut(1);    
+    }
+    
+    function getColor(type){
+        switch (type) {
+            case 'start':
+                return "#468847";
+            case 'end':
+                return "#B94A48";
+            default:  
+                return "#ff7800";
+                break;
+        }   
+    }
+    
+    
+    function drawPoints(GJfeat,type){
+        GJfeatObject=JSON.parse(GJfeat);
+        var geojsonMarkerOptions = {
+            radius: 8,
+            fillColor: getColor(type),
+            color: "#000",
+            weight: 1,
+            opacity: 1,
+            fillOpacity: 0.8
             
-            return feature.attributes.text;
-          });
-          var infoTemplate = new esri.InfoTemplate("Attributes", "${*}");
-          
-          route.setInfoTemplate(infoTemplate);
-          route.setAttributes(attr);
-          
-          routeGraphicLayer.add(route);
-          dojo.byId("directionsDiv").innerHTML = "Hover over the route to view directions";
+        };
+        
+        var gjPT = L.geoJson(GJfeatObject, {
+            pointToLayer: function (feature, latlng) {
+                return L.circleMarker(latlng, geojsonMarkerOptions);
+            }
         });
-        
-        //display any messages
-        if(solveResult.messages.length > 0){
-          dojo.byId("directionsDiv").innerHTML = "<b>Error:</b> " + solveResult.messages[0];
-        }      
-      });
 
-        
-        map.infoWindow.resize(200,125);
-      }
-
-      function locate() {
-        map.graphics.clear();
-        clearGraphics();
-        var address = {"Street":dojo.byId("address").value,"Zone":dojo.byId("zone").value};
-        locator.outSpatialReference= new esri.SpatialReference({wkid: 4326});//map.spatialReference; //new esri.SpatialReference({wkid: 2264});
-        var options = {
-          address:address,
-          outFields:["Loc_name"]
-        }
-        locator.addressToLocations(options);
-      }
-
-      function showResults(candidates) {
-        var candidate;
-        var symbol = new esri.symbol.SimpleMarkerSymbol();
-        var infoTemplate = new esri.InfoTemplate("Location", "Address: ${address}<br />Score: ${score}<br />Source locator: ${locatorName}");
-
-        symbol.setStyle(esri.symbol.SimpleMarkerSymbol.STYLE_SQUARE);
-        symbol.setColor(new dojo.Color([153,0,51,0.75]));
-
-        var geom;
-
-        
-        dojo.every(candidates,function(candidate){
-          console.log(candidate.score);
-          if (candidate.score > 80) {
-            console.log(candidate.location);
-            
-
-
-                  
-            var attributes = { address: candidate.address, score:candidate.score, locatorName:candidate.attributes.Loc_name };   
-            geom = candidate.location;
-            var graphic = new esri.Graphic(geom, symbol, attributes, infoTemplate);
-            //add a graphic to the map at the geocoded location
-            map.graphics.add(graphic);
-
-       var inPoint = new esri.geometry.Point(geom.x,geom.y,map.spatialReference);
-       //alert(geom.x);
-      var location = new esri.Graphic(inPoint);
-      incidentsGraphicsLayer.add(location);
-      
-      var features = [];
-      features.push(location);
-      var incidents = new esri.tasks.FeatureSet();
-      incidents.features = features;
-      params.incidents = incidents;
-
-      dojo.connect(routeGraphicLayer,"onMouseOver", function(evt){
-        //clear existing directions and highlight symbol
-        map.graphics.clear();
-        
-        dojo.byId("directionsDiv").innerHTML= "Hover over the route to view directions";
-        
-        var highlightSymbol = new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new dojo.Color([0,255,255],0.25), 4.5);
-        var highlightGraphic = new esri.Graphic(evt.graphic.geometry,highlightSymbol);
-        
-        map.graphics.add(highlightGraphic);
-        dojo.byId("directionsDiv").innerHTML = esri.substitute(evt.graphic.attributes,"${*}");
-
-      });
-
-      //solve 
-      closestFacilityTask.solve(params,function(solveResult){
-        var directions = solveResult.directions;
-      
-        dojo.forEach(solveResult.routes, function(route, index){
-          //build an array of route info
-          
-          var attr = dojo.map(solveResult.directions[index].features,function(feature){
-            
-            return feature.attributes.text;
-          });
-          var infoTemplate = new esri.InfoTemplate("Attributes", "${*}");
-          
-          route.setInfoTemplate(infoTemplate);
-          route.setAttributes(attr);
-          
-          routeGraphicLayer.add(route);
-          dojo.byId("directionsDiv").innerHTML = "Hover over the route to view directions";
-        });
-        
-        //display any messages
-        if(solveResult.messages.length > 0){
-          dojo.byId("directionsDiv").innerHTML = "<b>Error:</b> " + solveResult.messages[0];
-        }      
-      });
-      
-      closestHydrantTask.solve(params,function(solveResult){
-        var directions = solveResult.directions;
-      
-        dojo.forEach(solveResult.routes, function(route, index){
-          //build an array of route info
-          
-          var attr = dojo.map(solveResult.directions[index].features,function(feature){
-            
-            return feature.attributes.text;
-          });
-          var infoTemplate = new esri.InfoTemplate("Attributes", "${*}");
-          
-          route.setInfoTemplate(infoTemplate);
-          route.setAttributes(attr);
-          
-          routeGraphicLayer.add(route);
-          dojo.byId("directionsDiv").innerHTML = "Hover over the route to view directions";
-        });
-        
-        //display any messages
-        if(solveResult.messages.length > 0){
-          dojo.byId("directionsDiv").innerHTML = "<b>Error:</b> " + solveResult.messages[0];
-        }      
-      });
-                        
-            //add a text symbol to the map listing the location of the matched address.
-            var displayText = candidate.address;
-            var font = new esri.symbol.Font("16pt",esri.symbol.Font.STYLE_NORMAL, esri.symbol.Font.VARIANT_NORMAL,esri.symbol.Font.WEIGHT_BOLD,"Helvetica");
+       gjPT.addTo(map);
            
-            var textSymbol = new esri.symbol.TextSymbol(displayText,font,new dojo.Color("#666633"));
-            textSymbol.setOffset(0,8);
-            map.graphics.add(new esri.Graphic(geom, textSymbol));
-            return false; //break out of loop after one candidate with score greater  than 80 is found.
-          }
-        });
-        if(geom !== undefined){
-          map.centerAndZoom(geom,12);
-        }      
-      
-    }          
+    }
+    
+    function clearMap() {
+        for(i in map._layers) {
+            if(map._layers[i]._path != undefined) {
+                try {
+                    map.removeLayer(map._layers[i]);
+                }
+                catch(e) {
+                    //console.log("problem with " + e + map._layers[i]);
+                }
+            }
+        }
+    }
+        
+    function makeFacilityEnvelope(jd,distance){
+	   xStr=jd.candidates[0].location.x;
+	   yStr=jd.candidates[0].location.y;
+	   
+	   maxX=parseFloat(xStr)+parseFloat(distance);
+	   maxY=parseFloat(yStr)+parseFloat(distance);
 
-    dojo.ready(init);
+	   minX=parseFloat(xStr)-parseFloat(distance);
+	   minY=parseFloat(yStr)-parseFloat(distance);
+	   
+	   retVal=maxX+','+maxY+','+minX+','+minY;
+	   
+	   return retVal;
+	   
+	   
+    }//makeFacilityEnvelope
+    
+    function getFacilities(jd,closestType,distance){
+       
+
+       switch(closestType)
+            {
+            case 'ClosestFireStation':
+                facEnv=makeFacilityEnvelope(jd,15000);
+                var urlStr = 'http://coa-gis-imagery/COA_Internal_ArcGIS/rest/services/Publish/test_route/MapServer/1/query?text=&geometry='+facEnv+
+                             '&geometryType=esriGeometryEnvelope&inSR=2264&spatialRel=esriSpatialRelEnvelopeIntersects&relationParam=&objectIds=&where=&time='+
+                             '&returnIdsOnly=false&returnGeometry=true&maxAllowableOffset=&outSR=2264&outFields=label&f=pjson';              
+                break;
+            case 'ClosestHydrant':
+                facEnv=makeFacilityEnvelope(jd,500);
+                var urlStr = 'http://coa-gis-imagery/COA_Internal_ArcGIS/rest/services/Publish/test_route/MapServer/0/query?text=&geometry='+facEnv+
+                             '&geometryType=esriGeometryEnvelope&inSR=2264&spatialRel=esriSpatialRelEnvelopeIntersects&relationParam=&objectIds=&where=&time='+
+                             '&returnIdsOnly=false&returnGeometry=true&maxAllowableOffset=&outSR=2264&outFields=facilityid&f=pjson';              
+                 break;
+            default:  
+                facEnv=makeFacilityEnvelope(jd,15000);
+                var urlStr = 'http://coa-gis-imagery/COA_Internal_ArcGIS/rest/services/Publish/test_route/MapServer/1/query?text=&geometry='+facEnv+
+                             '&geometryType=esriGeometryEnvelope&inSR=2264&spatialRel=esriSpatialRelEnvelopeIntersects&relationParam=&objectIds=&where=&time='+
+                             '&returnIdsOnly=false&returnGeometry=true&maxAllowableOffset=&outSR=2264&outFields=label&f=pjson';              
+                break;
+            }//switch        
+           
+
+         $.ajax({
+                   url: urlStr,
+                   dataType: 'jsonp',
+                   crossDomain: true,
+                   jsonpCallback: 'MyJSONPCallback', // specify the callback name if you're hard-coding it
+                   jsonp : "callback",
+                   success:function(data){makeFacilityList(data,jd,closestType,distance);},
+                   error:function(data){updateResultsFail('Failed to find facilities for '+closestType+'!');}//console.log('ajax failed1');$('#loading').css('visibility','hidden');}
+        		   
+               });        
+        
+        return urlStr;
+    }//getFacilities
+    
+    function getClosest(jd,fac,closestType,distance){
+         
+       addressStr = $('#address').val();
+       ZipStr = $('#zone').val();
+	   xStr=jd.candidates[0].location.x;
+	   yStr=jd.candidates[0].location.y;
+	   
+	   //console.log(facEnv); 
+
+	   
+	   var urlStr = 'http://coa-gis-imagery/COA_Internal_ArcGIS/rest/services/Publish/test_route/NAServer/'+closestType+
+	                '/solveClosestFacility?incidents='+xStr+'%2C'+yStr+'&facilities='+fac+'&barriers=&polylineBarriers='+
+	                '&polygonBarriers=&travelDirection=esriNATravelDirectionToFacility&defaultCutoff=&defaultTargetFacilityCount=1'+
+	                '&outSR=4326&accumulateAttributeNames=Distance&impedanceAttributeName=Distance&restrictionAttributeNames=Use+One+Way'+
+	                '&attributeParameterValues=&restrictUTurns=esriNFSBAllowBacktrack&useHierarchy=true&returnDirections=true&'+
+	                'returnCFRoutes=true&returnFacilities=false&returnIncidents=false&returnBarriers=false&returnPolylineBarriers=false'+
+	                '&returnPolygonBarriers=false&directionsLanguage=en-US&directionsStyleName=NA+Desktop&outputLines=esriNAOutputLineTrueShape'+
+	                '&outputGeometryPrecision=&outputGeometryPrecisionUnits=esriUnknownUnits&directionsTimeAttributeName=Drive+Time'+
+	                '&directionsLengthUnits=esriNAUMiles&f=pjson';
+       var pt = '';
+       var retVal;
+       
+      
+       $.ajax({
+           url: urlStr,
+           dataType: 'jsonp',
+           crossDomain: true,
+           jsonpCallback: 'MyJSONPCallback', // specify the callback name if you're hard-coding it
+           jsonp : "callback",
+           success:function(data){dispResults(data,distance,closestType);},
+           error:function(data){updateResultsFail('Failed to get closeset facility!');}//console.log('ajax failed1');$('#loading').css('visibility','hidden');}
+		   
+       });
+       
+   }//getClosest
+   
+    
+    var updateResultsFail = function(amsg){
+      $('#loading').css('visibility','hidden');
+      $('#results').append('<span  class="text-danger" ><strong>' + amsg + '</strong></span>');
+        
+    }//getResults  
+   var getResults = function(data,closestType,distance){
+        //console.log('ajax success');
+        if(data.candidates.length==0){
+          updateResultsFail('No matching addresses!');
+        }else{
+          UpdateResults(data);
+          getFacilities(data,closestType,distance)
+        }
+        //getLatLong(data);
+        return data;
+        
+    }//getResults
+       
+    var makeFacilityList = function(data,jd,closestType,distance){
+        theFacs='{"features":[';
+
+        for(var i=0;i< data.features.length;i++){
+           switch(closestType)
+                {
+                case 'ClosestFireStation':
+                    theFacs+='{"geometry":{"x":'+data.features[i].geometry.x+',"y":'+data.features[i].geometry.y+'},"attributes":{"Name":"'+data.features[i].attributes.label+'"}},';
+                    break;
+                case 'ClosestHydrant':
+                    theFacs+='{"geometry":{"x":'+data.features[i].geometry.x+',"y":'+data.features[i].geometry.y+'},"attributes":{"Name":"'+data.features[i].attributes.facilityid+'"}},';
+                    break;   
+                default:  
+                    theFacs+='{"geometry":{"x":'+data.features[i].geometry.x+',"y":'+data.features[i].geometry.y+'},"attributes":{"Name":"'+data.features[i].attributes.label+'"}},';
+                    break;
+                }//switch            
+            
+       }
+        theFacs=theFacs.substring(0, theFacs.length-1); 
+        theFacs=theFacs+']}';
+        //console.log(theFacs);
+        getClosest(jd,theFacs,closestType,distance);
+        
+    }//makeFacilityList
+    var dispResults = function(data,distance,closestType){
+        //console.log(distance);
+        $('#loading').css('visibility','hidden');
+        
+        switch(distance){
+            case 'feet':
+                distTemp = parseFloat( data.routes.features[0].attributes.Total_Distance.toFixed(2) ).toFixed(2);
+                dist = parseFloat(distTemp*5280).toFixed(2)
+                distMsg = 'Feet';
+                break;
+            case 'miles':
+                dist = parseFloat( data.routes.features[0].attributes.Total_Distance.toFixed(2) ).toFixed(2);
+                distMsg = 'Miles';
+                break;
+            default:
+                dist = parseFloat( data.routes.features[0].attributes.Total_Distance.toFixed(2) ).toFixed(2);
+                distMsg = 'Miles';
+                break;
+        }
+        switch(closestType){
+            case 'ClosestFireStation':
+                typeMsg = 'Fire Station';
+                break;
+            case 'ClosestHydrant':
+                typeMsg = 'Fire Hydrant';
+                break;
+            default:
+                typeMsg = 'Fire Station';
+                break;
+        };
+        
+        clMsg='<strong>&nbsp;Is Closest to&nbsp;</strong>'
+        destMsg = data.routes.features[0].attributes.Name.replace('Location 1 - ','');
+        
+        $('#results').append(clMsg);
+        $('#results').append('<span class="text-danger"><strong>'+typeMsg+' '+destMsg+'&nbsp;</strong></span>'+
+                             '<span class="text-warning"><strong>('+dist+'&nbsp;'+distMsg+')</strong></span>');
+        
+           
+        drawRoute(data)
+    }   
+	function onEachFeature() {
+		var popupContent = "<p>test!</p>";
+	    layer.bindPopup(popupContent);
+	}
+	 
+
+
+   </script>
+  
+  <style type="text/css">
+    #map { height: 400px;
+           width:  100%;
+          }
+  </style>
+
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-43089083-1', 'cityofasheville.github.io');
+    ga('send', 'pageview');
+
   </script>
   </head>
 
-  <body>
 
-    <div class="navbar navbar-inverse navbar-fixed-top">
-      <div class="navbar-inner">
-        <div class="container">
-          <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="brand" href="#">Project name</a>
-          <div class="nav-collapse collapse">
-            <ul class="nav">
-              <li class="active"><a href="#">Home</a></li>
-              <li><a href="#about">About</a></li>
-              <li><a href="#contact">Contact</a></li>
-            </ul>
-          </div><!--/.nav-collapse -->
-        </div>
-      </div>
-    </div>
-
-    <div class="container">
-
-      <h1>Bootstrap starter template</h1>
-      <p>Use this document as a way to quick start any new project.<br> All you get is this message and a barebones HTML document.</p>
-  
-        <div class="span9">
-          <div class="row-fluid">
-            <div class="span9" >
-              <h2>Search</h2>
-              <p>Put search here</p>
-                        <!--
-                    <div id="leftPane" class="roundedCorners" 
-                        data-dojo-type="dijit.layout.ContentPane" 
-                        data-dojo-props="region:'left'">
-                        -->
-                       <p> Enter an input address and the application will use the sample address locator to return the location for 
-                        street addresses in the United States. </p>
-                        <br />Address:
-                        <input type="text" class="span9" id="address" value="70 court pz" />
-                        <!-- <textarea type="text" id="address"/>70 court pz</textArea> -->
-                        <br />Zip:
-                        <input type="text" class="span2" id="zone" value="28801" />
-                        <!-- <textarea type="text" id="zone"/>28801</textArea> -->
-                        <br />
-                        <!--
-                        <button type="submit" class="btn" onclick="locate()" >Submit</button>
-                        <button data-dojo-type="dijit.form.Button" onclick="locate()"> Locate</button>  
-                        </div>
-                        -->
-                    <div id="map" class="roundedCorners shadow" data-dojo-type="dijit.layout.ContentPane" data-dojo-props="region:'center'">
-                    </div>
+  <body data-twttr-rendered="true" background-color="#F0F0F0">
+    <div class="container bs-docs-container">
 
 
-              <div id="search"></div>
-              <!-- <button data-dojo-type="dijit.form.Button" onclick="locate()"> Locate</button>  -->
-              <p><button type="submit" class="btn" onclick="locate()" >Find it!</button></p>
-              <!--<p><a class="btn" href="#">View details &raquo;</a></p>-->
-            </div><!--/span-->
-           </div>
-        </div>
-        
-        <div class="span9">
-          <div class="row-fluid">
-            <div class="span9" >
-              <h2>Map</h2>
-               <!--<div id="map" class="map" style=" visibility:hidden; height: 250px;" >map</div>-->
-                <div id="mapdj" 
-                    data-dojo-type="dijit.layout.ContentPane" 
-                    data-dojo-props="region:'center'" class="panel">
-                </div>
 
+      <div class="panel panel-primary">
+        <div class="panel-heading"><h2>What's The Closest?</h2></div>
+<!--         <div class="row">
+          <div class="col-lg-6">
+            <div class="input-group">
+              <span class="input-group-addon">
+                 <span  class="text-primary">Address</span>
+              </span>
+              <input type="text" class="form-control" id="address" placeholder="70 court pz"  value="70 court pz">
+            </div>
+          </div><
+          <div class="col-lg-6">
+            <div class="input-group">
+              <span class="input-group-addon">
+                <span  class="text-primary">Zip Code</span>
+              </span>
+              <input type="text" class="form-control" id="zone" placeholder="28801"  value="28801">
             </div>
           </div>
-         </div>
-
-  
-        <div class="span9">
-          <div class="row-fluid">
-            <div class="span9" >
-              <h2>Directions</h2>
-              <p>Put search here</p>
-                    <div id="directions" 
-                         data-dojo-type="dijit.layout.ContentPane" 
-                         data-dojo-props="region:'bottom'" class="panel" 
-                         style="height:250px;">
-
-                      <b>Click the map to find routes for the
-                      <select name="numLocations" data-dojo-type="dijit.form.ComboBox" value="1" onChange="params.defaultTargetFacilityCount=this.value;clearGraphics();" style="width:60px;">
-                          <option selected="selected">1</option>
-                          <option>2</option>
-                          <option>3</option>
-                          <option>4</option>
-                          <option>5</option>
-                      </select> closest facilities to the input point.</b> 
-                      <div id="directionsDiv"></div>
-                      <br />
-                    </div>
-              
-            </div><!--/span-->
-           </div>
         </div>
-                 
-        <p><br/></p>
- 
+        <br /> -->
+        <fieldset>          
+          <label class="text-info" for="address">Enter the Address</label>
+          <input type="text" class="form-control" id="address" placeholder="70 court pz"  value="70 court pz">
+          <br />
+          <label class="text-info" for="zone">Enter the Zip Code</label>
+          <input type="text" class="form-control" id="zone" placeholder="28801"  value="28801">     
+          <br />
+          <label class="text-info" for="Button1">Click to find the closest </label>
+           <br/>
+          <button type="submit" class="btn btn-primary btn-sm"  id="Button1"  onclick="getAddress('ClosestFireStation','miles')">Fire Station</button>
+          <label class="text-info" for="Button2"> or </label>
+          <button type="submit" class="btn btn-primary btn-sm"  id="Button2"  onclick="getAddress('ClosestHydrant','feet')">Fire Hydrant</button>
+          <br/>
+          <br/>
+          <strong><label class="text-info" for="resultsholder">Get the Closest!</label></strong>
+          <div  class="panel text-info" id="resultsholder" >
+            <span id="results"></span>
+            <span id="loading" class="text-info" style="visibility:hidden">
+              <img   src="img/loading.gif" />
+            </span>
+          </div>
+          <div  class="panel" id="map" ></div>
+        </fieldset>
+      </div>
 
-    </div> <!-- /container -->
 
-    <!-- Le javascript
-    ================================================== -->
+
+    </div> 
+
+
     <!-- Placed at the end of the document so the pages load faster -->
-    <script src="js/jquery.js"></script>
-    <script src="js/bootstrap-transition.js"></script>
-    <script src="js/bootstrap-alert.js"></script>
-    <script src="js/bootstrap-modal.js"></script>
-    <script src="js/bootstrap-dropdown.js"></script>
-    <script src="js/bootstrap-scrollspy.js"></script>
-    <script src="js/bootstrap-tab.js"></script>
-    <script src="js/bootstrap-tooltip.js"></script>
-    <script src="js/bootstrap-popover.js"></script>
-    <script src="js/bootstrap-button.js"></script>
-    <script src="js/bootstrap-collapse.js"></script>
-    <script src="js/bootstrap-carousel.js"></script>
-    <script src="js/bootstrap-typeahead.js"></script>
-     <script type="text/javascript"  >
+    <script type="text/javascript">
+        var map = L.map('map').setView([35.593,-82.5488], 13);
 
+		L.tileLayer('http://{s}.tile.cloudmade.com/{key}/22677/256/{z}/{x}/{y}.png', {
+			attribution: 'Map data &copy; 2011 OpenStreetMap contributors, Imagery &copy; 2012 CloudMade',
+			key: 'BC9A493B41014CAABB98F0471D759707'
+		}).addTo(map);
 
-//    var map = L.map('map', {
-//    center:[35.600251, -82.570848],
-//    zoom: 10,
-//    zoomControl: false 
-//    });
-
-//    var zoom = new L.control.zoom();
-//    zoom.setPosition('topleft').addTo(map);
-//          
-
-//          
-//    // WMS layers from geoserver   
-//    var test = L.tileLayer.wms("http://opendataserver.ashevillenc.gov:80/geoserver/wms", {
-//         layers: 'bc_street_generalized',
-//         format: 'image/png',
-//         maxZoom: 25,
-//         minZoom: 12,
-//         transparent: true,
-//         zIndex: 1
-
-//    }).addTo(map);
-//   
-//       var test = L.tileLayer.wms("http://opendataserver.ashevillenc.gov:80/geoserver/wms", {
-//         layers: 'bc_street',
-//         format: 'image/png',
-//         maxZoom: 25,
-//         attributio: 'test',
-//         transparent: true,
-//         zIndex: 10
-
-//    }).addTo(map);
-    
-    //var COA_url = 'http://coa-gis-imagery/COA_Internal_ArcGIS/rest/services/Publish/Test_base_map_10/MapServerr/tile/{z}/{y}/{x}';
-    //var test = L.tileLayer(COA_url, {maxZoom: 11,attribution:'test'}).addTo(map);
-     </script>
+    </script>
+ 
   </body>
 </html>
