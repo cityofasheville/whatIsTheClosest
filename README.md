@@ -3,9 +3,9 @@ whatIsTheClosest!
 
 ###What it does###
 
-	Enter an address and get the closest item.  
-		My example uses hydrants and Fire stations
-	Returns a map and inforamtion about the closest item along with distance.
+Enter an address and get the closest item.  
+My example uses hydrants and Fire stations
+Returns a map and inforamtion about the closest item along with distance.
 
 
 #Setup Instructions#
