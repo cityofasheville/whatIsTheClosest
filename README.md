@@ -4,8 +4,7 @@ whatIsTheClosest!
 ###What it does###
 
 Enter an address and get the closest item.  
-My example uses hydrants and Fire stations
-Returns a map and information about the closest item along with distance.
+My example uses hydrants and Fire stations and returns a map, Name of the closest item, and distance.
 
 
 #Setup Instructions#
@@ -27,7 +26,7 @@ Returns a map and information about the closest item along with distance.
 		//This is for netorking
 		var agsServerNetwork='coa-gis-imagery'; //ArcGIS  server name for networking
 		var agsServerInstanceNameNetwork='COA_Internal_ArcGIS'; //ArcGIS  server instance for networking
-		
+
 		//hyrdrants
 		var HydrantLayerIDX='0'; //layer index  for hydrants
 		var HydrantNameField='facilityid'; //Field for name in hydrant layer
