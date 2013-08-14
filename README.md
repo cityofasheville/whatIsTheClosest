@@ -24,12 +24,20 @@ Returns a map and inforamtion about the closest item along with distance.
 	
 	Change the following to match your ArcGIS server setup
 		//setup 
-		//This is for netorking      
+		//This is for netorking
 		var agsServerNetwork='coa-gis-imagery'; //arcgis server name for networking
 		var agsServerInstanceNameNetwork='COA_Internal_ArcGIS'; //arcgis server instance for networking
+		//hyrdrants
 		var HydrantLayerIDX='0'; //layer index  for hydrants
-		var ClosestFireStationIDX='1'; //layer index  for firestations
+		var HydrantNameField='facilityid'; //Field for name in hydrant layer
+		var HydrantDistance=500; //Ditance to get hydrants around addresss this helps with performance
+
+		//Fire stations
+		var FireStationIDX='1'; //layer index  for firestations
+		var FireStationNameField='label'; //Field for name in fire station layer
+		var FireStationDistance=15000; //Ditance to get fire stations around addresss this helps with performance
 		var RoutingServiceName='test_route'; //name of the map service containg network and the closest facility problem
+
 
 		//This is for geocoding
 		var agsServerGeocode='gis.ashevillenc.gov'; //arcgis server name for geocoding

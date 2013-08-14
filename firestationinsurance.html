@@ -35,9 +35,17 @@
       //This is for netorking
       var agsServerNetwork='coa-gis-imagery'; //arcgis server name for networking
       var agsServerInstanceNameNetwork='COA_Internal_ArcGIS'; //arcgis server instance for networking
+      //hyrdrants
       var HydrantLayerIDX='0'; //layer index  for hydrants
-      var ClosestFireStationIDX='1'; //layer index  for firestations
+      var HydrantNameField='facilityid'; //Field for name in hydrant layer
+      var HydrantDistance=500; //Ditance to get hydrants around addresss this helps with performance
+
+      //Fire stations
+      var FireStationIDX='1'; //layer index  for firestations
+      var FireStationNameField='label'; //Field for name in fire station layer
+      var FireStationDistance=15000; //Ditance to get fire stations around addresss this helps with performance
       var RoutingServiceName='test_route'; //name of the map service containg network and the closest facility problem
+       
 
       //This is for geocoding
       var agsServerGeocode='gis.ashevillenc.gov'; //arcgis server name for geocoding
@@ -46,13 +54,13 @@
 
       var mySRID=2264 //your projection id
 
-    function UpdateResults(jd,idStr){
-      $('#results').append('<span  class="text-success" ><strong>' + jd.candidates[0].address + '</strong></span>');
+    function UpdateResults(someData,idStr){
+      $('#results').append('<span  class="text-success" ><strong>' + someData.candidates[0].address + '</strong></span>');
     }
 
-    function getLatLong(jd){
-      xStr=jd.candidates[0].location.x;
-      yStr=jd.candidates[0].location.y;
+    function getLatLong(someData){
+      xStr=someData.candidates[0].location.x;
+      yStr=someData.candidates[0].location.y;
       var urlStr = 'http://'+agsServerNetwork+'/'+agsServerInstanceNameNetwork+'/rest/services/Geometry/GeometryServer/project';
       var aPt='{"x":'+xStr+',"y":'+yStr+'}';
 
@@ -179,9 +187,9 @@
         }
     }
         
-    function makeFacilityEnvelope(jd,distance){
-	   xStr=jd.candidates[0].location.x;
-	   yStr=jd.candidates[0].location.y;
+    function makeFacilityEnvelope(someData,distance){
+	   xStr=someData.candidates[0].location.x;
+	   yStr=someData.candidates[0].location.y;
 	   
 	   maxX=parseFloat(parseFloat(xStr)+parseFloat(distance));
 	   maxY=parseFloat(parseFloat(yStr)+parseFloat(distance));
@@ -194,23 +202,36 @@
 	   return retVal;
     }//makeFacilityEnvelope
     
-    function getFacilities(jd,closestType,distance){
+    function getFacilities(someData,closestType,distance){
       var mainURL = 'http://'+agsServerNetwork+'/'+agsServerInstanceNameNetwork+'/rest/services/Publish/'+RoutingServiceName+'/MapServer/';
+
       switch(closestType){
         case 'ClosestFireStation':
-          facEnv=makeFacilityEnvelope(jd,15000);
-          var urlStr = mainURL+ClosestFireStationIDX+'/query';
-          var data ={f:"json",outSR:mySRID,inSR:mySRID,geometry:facEnv,geometryType:"esriGeometryEnvelope",spatialRel:"esriSpatialRelEnvelopeIntersects",outFields:"label"};
+          facEnv=makeFacilityEnvelope(someData,FireStationDistance);
+          var urlStr = mainURL+FireStationIDX+'/query';
+          var jobj = {f:"json",outSR:mySRID,inSR:mySRID,geometry:facEnv,geometryType:"esriGeometryEnvelope",spatialRel:"esriSpatialRelEnvelopeIntersects",outFields:"replacenamefield"};
+          var jsonstr = JSON.stringify(jobj);
+          jsonstr = jsonstr.replace("replacenamefield",FireStationNameField);
+          jobj = $.parseJSON(jsonstr, true);          
+          var data = jobj;
           break;
         case 'ClosestHydrant':
-          facEnv=makeFacilityEnvelope(jd,500);
-          var urlStr = mainURL+HydrantLayerIDX+'/query';
-          var data ={f:"json",outSR:mySRID,inSR:mySRID,geometry:facEnv,geometryType:"esriGeometryEnvelope",spatialRel:"esriSpatialRelEnvelopeIntersects",outFields:"facilityid"};
+          facEnv=makeFacilityEnvelope(someData,HydrantDistance);
+          var urlStr = mainURL+HydrantLayerIDX+'/query';          
+          var jobj = {f:"json",outSR:mySRID,inSR:mySRID,geometry:facEnv,geometryType:"esriGeometryEnvelope",spatialRel:"esriSpatialRelEnvelopeIntersects",outFields:"replacenamefield"};
+          var jsonstr = JSON.stringify(jobj);
+          jsonstr = jsonstr.replace("replacenamefield",HydrantNameField);
+          jobj = $.parseJSON(jsonstr, true);          
+          var data = jobj;
           break;
         default:  
-          facEnv=makeFacilityEnvelope(jd,15000);
-          var urlStr = mainURL+ClosestFireStationIDX+'/query';
-          var data ={f:"json",outSR:mySRID,inSR:mySRID,geometry:facEnv,geometryType:"esriGeometryEnvelope",spatialRel:"esriSpatialRelEnvelopeIntersects",outFields:"label"};
+          facEnv=makeFacilityEnvelope(someData,FireStationDistance);
+          var urlStr = mainURL+FireStationIDX+'/query';
+          var jobj = {f:"json",outSR:mySRID,inSR:mySRID,geometry:facEnv,geometryType:"esriGeometryEnvelope",spatialRel:"esriSpatialRelEnvelopeIntersects",outFields:"replacenamefield"};
+          var jsonstr = JSON.stringify(jobj);
+          jsonstr = jsonstr.replace("replacenamefield",FireStationNameField);
+          jobj = $.parseJSON(jsonstr, true);          
+          var data = jobj;
           break;
         }//switch        
         
@@ -220,19 +241,19 @@
           dataType: 'jsonp',
           data:data,
           crossDomain: true,
-          success:function(data){makeFacilityList(data,jd,closestType,distance);},
+          success:function(data){makeFacilityList(data,someData,closestType,distance);},
           error:function(data){updateResultsFail('Failed to find facilities for '+closestType+'!');}
         });        
         
         return urlStr;
     }//getFacilities
     
-    function getClosest(jd,fac,closestType,distance){
+    function getClosest(someData,fac,closestType,distance){
          
        addressStr = $('#address').val();
        ZipStr = $('#zone').val();
-       xStr=jd.candidates[0].location.x;
-       yStr=jd.candidates[0].location.y;
+       xStr=someData.candidates[0].location.x;
+       yStr=someData.candidates[0].location.y;
 	   
 	     var urlStr = 'http://'+agsServerNetwork+'/'+agsServerInstanceNameNetwork+'/rest/services/Publish/'+RoutingServiceName+'/NAServer/'+closestType+'/solveClosestFacility';
        var data = {f:"json",outSR:4326,returnFacilities:false,returnIncidents:false,incidents:xStr+','+yStr,facilities:fac};      
@@ -269,7 +290,7 @@
         
     }//getResults
        
-    var makeFacilityList = function(data,jd,closestType,distance){
+    var makeFacilityList = function(data,someData,closestType,distance){
         theFacs='{"features":[';
 
         for(var i=0;i< data.features.length;i++){
@@ -289,7 +310,7 @@
        }
         theFacs=theFacs.substring(0, theFacs.length-1); 
         theFacs=theFacs+']}';
-        getClosest(jd,theFacs,closestType,distance);
+        getClosest(someData,theFacs,closestType,distance);
         
     }//makeFacilityList
 
