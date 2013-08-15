@@ -19,7 +19,7 @@ My example uses hydrants and Fire stations and returns a map, the name of the cl
 * Jquery
 
 
-###Open the index.html file find the lines:###
+###Open the js/whatistheclosest.js file find the lines:###
 	
 	Change the following to match your ArcGIS server setup
 		//setup 
@@ -44,4 +44,7 @@ My example uses hydrants and Fire stations and returns a map, the name of the cl
 		var agsServerInstanceNameGeocode='COA_ArcGIS_Server'; //ArcGIS  server instance for geocoding
 		var geocdingLayerName='Buncombe_Streets_With_Zip'; //geocoding service to use.
 
+		var facilitytimeout=6000 //time out for looking for facilites.  
+		                       //This is hapened for data in internal servers...
+		                       
 		var mySRID=2264 //your projection id
