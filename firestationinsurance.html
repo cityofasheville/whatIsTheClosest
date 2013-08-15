@@ -231,7 +231,7 @@
           break;
         }//switch        
         
-        
+        alert('getFacilities');
         $.ajax({
           url: urlStr,
           dataType: 'jsonp',
@@ -287,13 +287,15 @@
     }//getResults
        
     var makeFacilityList = function(data,someData,closestType,distance){
-      alert('here');
+
         theFacs='{"features":[';
         if (data.features.length == 0){
+          alert('no make make facilites features');
           $('#loading').css('visibility','hidden');
           $('#results').append('<span  class="text-danger" ><strong>Unable to find any Closest Locations!  <br/>'+
                                 'You may not have access to the locations data or there are none.</strong></span>');
         }else{
+          alert(data.features.length+' make make facilites features');
           for(var i=0;i< data.features.length;i++){
              switch(closestType)
                   {
