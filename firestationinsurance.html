@@ -238,7 +238,8 @@
           data:data,
           crossDomain: true,
           success:function(data){makeFacilityList(data,someData,closestType,distance);},
-          error:function(data){updateResultsFail('Failed to find facilities for '+closestType+'!');}
+          error:function(data){updateResultsFail('Failed to find facilities for '+closestType+'!');},
+          timeout:1000
         });        
         
         return urlStr;
@@ -261,7 +262,6 @@
            crossDomain: true,
            success:function(data){dispResults(data,distance,closestType);},
            error:function(data){updateResultsFail('Failed to get closeset facility!');}
-		   
        });
        
    }//getClosest
