@@ -183,6 +183,7 @@
     }
         
     function makeFacilityEnvelope(someData,distance){
+
 	   xStr=someData.candidates[0].location.x;
 	   yStr=someData.candidates[0].location.y;
 	   
@@ -287,26 +288,29 @@
        
     var makeFacilityList = function(data,someData,closestType,distance){
         theFacs='{"features":[';
-
-        for(var i=0;i< data.features.length;i++){
-           switch(closestType)
-                {
-                case 'ClosestFireStation':
-                    theFacs+='{"geometry":{"x":'+data.features[i].geometry.x+',"y":'+data.features[i].geometry.y+'},"attributes":{"Name":"'+data.features[i].attributes.label+'"}},';
-                    break;
-                case 'ClosestHydrant':
-                    theFacs+='{"geometry":{"x":'+data.features[i].geometry.x+',"y":'+data.features[i].geometry.y+'},"attributes":{"Name":"'+data.features[i].attributes.facilityid+'"}},';
-                    break;   
-                default:  
-                    theFacs+='{"geometry":{"x":'+data.features[i].geometry.x+',"y":'+data.features[i].geometry.y+'},"attributes":{"Name":"'+data.features[i].attributes.label+'"}},';
-                    break;
-                }//switch            
-            
-       }
-        theFacs=theFacs.substring(0, theFacs.length-1); 
-        theFacs=theFacs+']}';
-        getClosest(someData,theFacs,closestType,distance);
-        
+        if (data.features.length == 0){
+          $('#loading').css('visibility','hidden');
+          $('#results').append('<span  class="text-danger" ><strong>Unable to find any Closest Locations!  <br/>'+
+                                'You may not have access to the locations data or there are none.</strong></span>');
+        }else{
+          for(var i=0;i< data.features.length;i++){
+             switch(closestType)
+                  {
+                  case 'ClosestFireStation':
+                      theFacs+='{"geometry":{"x":'+data.features[i].geometry.x+',"y":'+data.features[i].geometry.y+'},"attributes":{"Name":"'+data.features[i].attributes.label+'"}},';
+                      break;
+                  case 'ClosestHydrant':
+                      theFacs+='{"geometry":{"x":'+data.features[i].geometry.x+',"y":'+data.features[i].geometry.y+'},"attributes":{"Name":"'+data.features[i].attributes.facilityid+'"}},';
+                      break;   
+                  default:  
+                      theFacs+='{"geometry":{"x":'+data.features[i].geometry.x+',"y":'+data.features[i].geometry.y+'},"attributes":{"Name":"'+data.features[i].attributes.label+'"}},';
+                      break;
+                  }//switch
+          }
+          theFacs=theFacs.substring(0, theFacs.length-1); 
+          theFacs=theFacs+']}';
+          getClosest(someData,theFacs,closestType,distance);
+      }
     }//makeFacilityList
 
     var dispResults = function(data,distance,closestType){
