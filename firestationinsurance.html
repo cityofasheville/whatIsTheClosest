@@ -67,7 +67,7 @@
            data:data,
            crossDomain: true,
            success:function(data){zoomMap(data);},
-           error:function(data){updateResultsFail('Error with transforming to WGS84!');}
+           error:function(x,t,m){updateResultsFail(t,'Error with transforming to WGS84!');}
        });
      }
 
@@ -93,7 +93,7 @@
            data:data,
            crossDomain: true,
            success:function(data){getResults(data,closestType,distance);},
-           error:function(data){updateResultsFail('Failed to get address!');}//console.log('ajax failed');}
+           error:function(x,t,m){updateResultsFail(t,'Failed to get address!');}//console.log('ajax failed');}
        });
      }
 
@@ -231,15 +231,14 @@
           break;
         }//switch        
         
-        alert('getFacilities');
         $.ajax({
           url: urlStr,
           dataType: 'jsonp',
           data:data,
           crossDomain: true,
           success:function(data){makeFacilityList(data,someData,closestType,distance);},
-          error:function(data){updateResultsFail('Failed to find facilities for '+closestType+'!');},
-          timeout:1000
+          error:function(x,t,m){updateResultsFail(t,'Failed to find facilities for '+closestType+'!');},
+          timeout:5000
         });        
         
         return urlStr;
@@ -261,22 +260,26 @@
            data:data,
            crossDomain: true,
            success:function(data){dispResults(data,distance,closestType);},
-           error:function(data){updateResultsFail('Failed to get closeset facility!');}
+           error:function(x,tm){updateResultsFail(t,'Failed to get closeset facility!');}
        });
        
    }//getClosest
    
     
-    var updateResultsFail = function(amsg){
-      $('#loading').css('visibility','hidden');
-      $('#results').append('<span  class="text-danger" ><strong>' + amsg + '</strong></span>');
-        
+    var updateResultsFail = function(t,amsg){
+      if(t==="timeout") {
+        $('#loading').css('visibility','hidden');
+        $('#results').append('<span  class="text-danger" ><strong>Unable to complete! Maybe you cannot access the data feeds?</strong></span>');        
+      }else{
+        $('#loading').css('visibility','hidden');
+        $('#results').append('<span  class="text-danger" ><strong>' + amsg + '</strong></span>');
+      }
     }//updateResultsFail
 
    var getResults = function(data,closestType,distance){
         
         if(data.candidates.length==0){
-          updateResultsFail('No matching addresses!');
+          updateResultsFail('','No matching addresses!');
         }else{
           UpdateResults(data);
           getFacilities(data,closestType,distance)
@@ -290,12 +293,10 @@
 
         theFacs='{"features":[';
         if (data.features.length == 0){
-          alert('no make make facilites features');
           $('#loading').css('visibility','hidden');
           $('#results').append('<span  class="text-danger" ><strong>Unable to find any Closest Locations!  <br/>'+
                                 'You may not have access to the locations data or there are none.</strong></span>');
         }else{
-          alert(data.features.length+' make make facilites features');
           for(var i=0;i< data.features.length;i++){
              switch(closestType)
                   {
