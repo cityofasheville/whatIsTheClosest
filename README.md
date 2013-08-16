@@ -20,8 +20,8 @@ My example uses hydrants and Fire stations and returns a map, the name of the cl
 
 
 ###Open the js/whatistheclosest.js file find the lines:###
-	
-	Change the following to match your ArcGIS server setup
+Change the following to match your ArcGIS server setup
+
 		//setup 
 		//This is for netorking
 		var agsServerNetwork='coa-gis-imagery'; //ArcGIS  server name for networking
