@@ -20,7 +20,7 @@
       var agsServerInstanceNameGeocode='COA_ArcGIS_Server'; //ArcGIS  server instance for geocoding
       var geocdingLayerName='Buncombe_Streets_With_Zip'; //geocoding service to use.
 
-      var facilitytimeout=6000 //time out for looking for facilites.  
+      var facilitytimeout=7000 //time out for looking for facilites.  
                                //This is hapened for data in internal servers...
                                
       var mySRID=2264 //your projection id
